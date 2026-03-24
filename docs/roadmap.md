@@ -15,21 +15,21 @@ _Do this once, before any code. Claude Code reads these files automatically on e
 - [ ] **RabbitMQ exchanges + queues** — rabbitmq.com/tutorials, tutorials 1–4 (~1 hour) — understand topic exchanges and queue bindings before wiring the event bus
 - [ ] _(Before Phase 6)_ **Module Federation with Vite** — `@originjs/vite-plugin-federation` README + examples — how remotes and the host shell are wired at build time
 
-- [ ] Set local git identity in each repo (do this immediately after `git init` / cloning, before the first commit):
+- [x] Set local git identity in each repo (do this immediately after `git init` / cloning, before the first commit):
   ```bash
   git config user.name "Kim Andrè Furevikstrand"
   git config user.email "lozymon@gmail.com"
   ```
   Do this for all three repos: `familieoya`, `familieoya-mobile`, `familieoya-landing`.
-- [ ] Copy all planning docs into `docs/` folder in the project root: `services.md`, `edge-cases.md`, `roadmap.md`, `frontend.md`, `billing.md`, `deployment.md`, `ai-features.md`, `claude-code.md`. Claude Code only reads files inside the project directory — docs left in `todo-projects/` will be invisible to it.
+- [x] Copy all planning docs into `docs/` folder in the project root: `services.md`, `edge-cases.md`, `roadmap.md`, `frontend.md`, `billing.md`, `deployment.md`, `ai-features.md`, `claude-code.md`. Claude Code only reads files inside the project directory — docs left in `todo-projects/` will be invisible to it.
 - [ ] Copy `mobile.md` into the `familieoya-mobile` repo's `docs/` folder instead.
-- [ ] Create root `CLAUDE.md` — use template in `docs/claude-code.md`. References `docs/` paths.
+- [x] Create root `CLAUDE.md` — use template in `docs/claude-code.md`. References `docs/` paths.
 - [ ] Create per-service `CLAUDE.md` stub (fill in as each service is scaffolded) — service responsibility, DB tables, events published/consumed, test commands
 - [ ] Add `.env.example` with all required env vars (see `docs/billing.md` for Stripe vars, `docs/deployment.md` for the rest)
 - [ ] Set up **GitHub MCP** (`claude mcp add github`) — enables CI status, issue creation, PR review from Claude Code
 - [ ] Set up **PostgreSQL MCP** (`claude mcp add postgres`) — query service DBs directly during development (add when first DB is running in Phase 1)
-- [ ] Set up **Context7 MCP** (`claude mcp add context7 -- npx -y @upstash/context7-mcp`) — pulls versioned library docs (NestJS, TypeORM, Riverpod, etc.) into context on demand; avoids hallucinated APIs
-- [ ] Set up **Sequential Thinking MCP** (`claude mcp add sequential-thinking -- npx -y @modelcontextprotocol/server-sequential-thinking`) — structured multi-step reasoning for complex cross-service design problems
+- [x] Set up **Context7 MCP** (`claude mcp add context7 -- npx -y @upstash/context7-mcp`) — pulls versioned library docs (NestJS, TypeORM, Riverpod, etc.) into context on demand; avoids hallucinated APIs
+- [x] Set up **Sequential Thinking MCP** (`claude mcp add sequential-thinking -- npx -y @modelcontextprotocol/server-sequential-thinking`) — structured multi-step reasoning for complex cross-service design problems
 - [ ] Install **cc-status-line** (`npx cc-status-line@latest`) — adds a status bar to Claude Code showing context %, session cost, model, and git branch. Keep context below ~50% before starting a new session to avoid degraded output.
 - [ ] _(Phase 10)_ Set up **Stripe MCP** when starting billing — inspect products, prices, webhook logs from Claude Code
 - [ ] Install `@nestjs/swagger` on `api-gateway` — configure Swagger UI at `/docs`, enable the NestJS Swagger CLI plugin in `nest-cli.json` to auto-infer DTO properties from TypeScript types (reduces manual `@ApiProperty()` decoration significantly)
@@ -40,7 +40,7 @@ _Do this once, before any code. Claude Code reads these files automatically on e
 
 _Goal: Monorepo scaffold + auth working end-to-end_
 
-- [ ] Init Nx monorepo (`npx create-nx-workspace@latest familieoya --preset=ts`) — Nx is chosen over native Nest CLI for build caching and task orchestration across 10 services + 6 MFEs
+- [x] Init Nx monorepo (`npx create-nx-workspace@latest familieoya --preset=ts`) — Nx is chosen over native Nest CLI for build caching and task orchestration across 10 services + 6 MFEs
 - [ ] Set up `libs/contracts` — `BaseEvent` (with `eventId: string`), first event interfaces (`UserRegisteredEvent` incl. `preferredLanguage`, `UserDeletedEvent`)
 - [ ] Set up `libs/common` with shared JWT guard, `X-Household-ID` validation guard + decorators
 - [ ] Set up `libs/testing` with DB reset helpers
