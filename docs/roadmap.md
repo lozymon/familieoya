@@ -25,7 +25,7 @@ _Do this once, before any code. Claude Code reads these files automatically on e
 - [ ] Copy `mobile.md` into the `familieoya-mobile` repo's `docs/` folder instead.
 - [x] Create root `CLAUDE.md` — use template in `docs/claude-code.md`. References `docs/` paths.
 - [ ] Create per-service `CLAUDE.md` stub (fill in as each service is scaffolded) — service responsibility, DB tables, events published/consumed, test commands
-- [ ] Add `.env.example` with all required env vars (see `docs/billing.md` for Stripe vars, `docs/deployment.md` for the rest)
+- [x] Add `.env.example` with all required env vars (see `docs/billing.md` for Stripe vars, `docs/deployment.md` for the rest)
 - [ ] Set up **GitHub MCP** (`claude mcp add github`) — enables CI status, issue creation, PR review from Claude Code
 - [ ] Set up **PostgreSQL MCP** (`claude mcp add postgres`) — query service DBs directly during development (add when first DB is running in Phase 1)
 - [x] Set up **Context7 MCP** (`claude mcp add context7 -- npx -y @upstash/context7-mcp`) — pulls versioned library docs (NestJS, TypeORM, Riverpod, etc.) into context on demand; avoids hallucinated APIs
@@ -41,15 +41,15 @@ _Do this once, before any code. Claude Code reads these files automatically on e
 _Goal: Monorepo scaffold + auth working end-to-end_
 
 - [x] Init Nx monorepo (`npx create-nx-workspace@latest familieoya --preset=ts`) — Nx is chosen over native Nest CLI for build caching and task orchestration across 10 services + 6 MFEs
-- [ ] Set up `libs/contracts` — `BaseEvent` (with `eventId: string`), first event interfaces (`UserRegisteredEvent` incl. `preferredLanguage`, `UserDeletedEvent`)
-- [ ] Set up `libs/common` with shared JWT guard, `X-Household-ID` validation guard + decorators
-- [ ] Set up `libs/testing` with DB reset helpers
-- [ ] Scaffold `api-gateway` — JWT validation, `X-Household-ID` membership check, proxy routing
-- [ ] Scaffold `auth-service` — register, login, JWT issuance (RS256), `preferredLanguage` stored on user
-- [ ] Docker Compose: gateway + auth + postgres_auth + RabbitMQ
-- [ ] Integration tests for register → login → verify token flow
-- [ ] Create `docker-compose.test.yml` — infrastructure only (postgres + rabbitmq, no frontend, `_test` DB names)
-- [ ] Set up GitHub Actions CI (`.github/workflows/ci.yml`):
+- [x] Set up `libs/contracts` — `BaseEvent` (with `eventId: string`), first event interfaces (`UserRegisteredEvent` incl. `preferredLanguage`, `UserDeletedEvent`)
+- [x] Set up `libs/common` with shared JWT guard, `X-Household-ID` validation guard + decorators
+- [x] Set up `libs/testing` with DB reset helpers
+- [x] Scaffold `api-gateway` — JWT validation, `X-Household-ID` membership check, proxy routing
+- [x] Scaffold `auth-service` — register, login, JWT issuance (RS256), `preferredLanguage` stored on user
+- [x] Docker Compose: gateway + auth + postgres_auth + RabbitMQ
+- [x] Integration tests for register → login → verify token flow
+- [x] Create `docker-compose.test.yml` — infrastructure only (postgres + rabbitmq, no frontend, `_test` DB names)
+- [x] Set up GitHub Actions CI (`.github/workflows/ci.yml`):
 
 ```yaml
 name: CI
