@@ -32,7 +32,7 @@ import { InternalApiGuard } from '@familieoya/common';
             urls: [config.getOrThrow<string>('RABBITMQ_URL')],
             exchange: 'familieoya',
             exchangeType: 'topic',
-            noAck: false,
+            // noAck: false applies to consumers only — publishers don't ack
           },
         }),
       },

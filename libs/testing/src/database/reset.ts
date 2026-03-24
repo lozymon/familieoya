@@ -2,12 +2,15 @@ import { DataSource } from 'typeorm';
 
 /**
  * Truncates all tables in the test database between test runs.
- * Uses session_replication_role to bypass FK constraints during truncation.
+ * RESTART IDENTITY resets sequences; CASCADE handles FK order automatically.
  */
 export async function resetDatabase(dataSource: DataSource): Promise<void> {
-  await dataSource.query("SET session_replication_role = 'replica'");
-  for (const entity of dataSource.entityMetadatas) {
-    await dataSource.query(`TRUNCATE TABLE "${entity.tableName}" CASCADE`);
+  const tableNames = dataSource.entityMetadatas
+    .map((e) => `"${e.tableName}"`)
+    .join(', ');
+  if (tableNames) {
+    await dataSource.query(
+      `TRUNCATE TABLE ${tableNames} RESTART IDENTITY CASCADE`,
+    );
   }
-  await dataSource.query("SET session_replication_role = 'DEFAULT'");
 }

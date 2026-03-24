@@ -19,5 +19,6 @@ module.exports = {
     '^@familieoya/common$': '<rootDir>/libs/common/src/index.ts',
     '^@familieoya/testing$': '<rootDir>/libs/testing/src/index.ts',
   },
+  setupFiles: ['<rootDir>/jest.integration.setup.js'],
   testTimeout: 30000,
 };
