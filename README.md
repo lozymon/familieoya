@@ -1,109 +1,137 @@
-# Familieoya
+# Familieøya
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+A family budget app built as a portfolio project demonstrating production-grade architecture:
+NestJS microservices backend, React 19 microfrontend (Module Federation), and a Flutter mobile app.
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
+---
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/nx-api/js?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
-
-## Generate a library
-
-```sh
-npx nx g @nx/js:lib packages/pkg1 --publishable --importPath=@my-org/pkg1
-```
-
-## Run tasks
-
-To build the library use:
-
-```sh
-npx nx build pkg1
-```
-
-To run any task with Nx use:
-
-```sh
-npx nx <target> <project-name>
-```
-
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
-
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Versioning and releasing
-
-To version and release the library use
+## Architecture
 
 ```
-npx nx release
+┌─────────────────────────────────────────────────────────────────┐
+│                        api-gateway :3000                        │
+│   JWT validation · X-Household-ID check · rate limiting · proxy │
+└───────────┬──────────────────────────────┬──────────────────────┘
+            │                              │
+     ┌──────▼──────┐               ┌───────▼────────┐
+     │ auth-service│               │household-service│  ← Phase 2
+     │    :3001    │               │     :3002       │
+     └──────┬──────┘               └────────────────┘
+            │ RabbitMQ (topic exchange: familieoya)
+     ┌──────▼──────────────────────────────────────┐
+     │  notification · budget · transaction · audit │  ← later phases
+     └─────────────────────────────────────────────┘
 ```
 
-Pass `--dry-run` to see what would happen without actually releasing the library.
+**Key architecture rules:**
+- No `householdId` in JWT — client sends `X-Household-ID` header, gateway validates membership
+- Services never query each other's databases — RabbitMQ for async, HTTP for sync reads
+- All amounts are integers (øre/cents) — never store floats
+- All events extend `BaseEvent` with `eventId: crypto.randomUUID()` set by the publisher
+- `noAck: false` on all RabbitMQ consumers — manual ack only
 
-[Learn more about Nx release &raquo;](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+See [`docs/services.md`](docs/services.md) for full service contracts and [`docs/edge-cases.md`](docs/edge-cases.md) for implementation patterns.
 
-## Keep TypeScript project references up to date
+---
 
-Nx automatically updates TypeScript [project references](https://www.typescriptlang.org/docs/handbook/project-references.html) in `tsconfig.json` files to ensure they remain accurate based on your project dependencies (`import` or `require` statements). This sync is automatically done when running tasks such as `build` or `typecheck`, which require updated references to function correctly.
+## Monorepo structure
 
-To manually trigger the process to sync the project graph dependencies information to the TypeScript project references, run the following command:
-
-```sh
-npx nx sync
+```
+apps/
+  api-gateway/        ← public entry point, JWT + proxy
+  auth-service/       ← register, login, JWT issuance (RS256)
+libs/
+  contracts/          ← shared event interfaces + DTOs
+  common/             ← JWT guard, HouseholdGuard, InternalApiGuard, decorators
+  testing/            ← resetDatabase(), createTestRabbitMQClient()
+docs/                 ← architecture docs (read before coding)
 ```
 
-You can enforce that the TypeScript project references are always in the correct state when running in CI by adding a step to your CI job configuration that runs the following command:
+---
 
-```sh
-npx nx sync:check
+## Running locally
+
+### 1. Generate RS256 key pair
+
+```bash
+openssl genrsa -out auth_private.pem 2048
+openssl rsa -in auth_private.pem -pubout -out auth_public.pem
 ```
 
-[Learn more about nx sync](https://nx.dev/reference/nx-commands#sync)
+### 2. Create `.env`
 
-## Set up CI!
-
-### Step 1
-
-To connect to Nx Cloud, run the following command:
-
-```sh
-npx nx connect
+```bash
+cp .env.example .env
 ```
 
-Connecting to Nx Cloud ensures a [fast and scalable CI](https://nx.dev/ci/intro/why-nx-cloud?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) pipeline. It includes features such as:
+Paste the key contents into `.env`, replacing newlines with `\n`:
 
-- [Remote caching](https://nx.dev/ci/features/remote-cache?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task distribution across multiple machines](https://nx.dev/ci/features/distribute-task-execution?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Automated e2e test splitting](https://nx.dev/ci/features/split-e2e-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task flakiness detection and rerunning](https://nx.dev/ci/features/flaky-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-### Step 2
-
-Use the following command to configure a CI workflow for your workspace:
-
-```sh
-npx nx g ci-workflow
+```bash
+JWT_PRIVATE_KEY="$(awk 'NF {sub(/\r/, ""); printf "%s\\n",$0;}' auth_private.pem)"
+JWT_PUBLIC_KEY="$(awk 'NF {sub(/\r/, ""); printf "%s\\n",$0;}' auth_public.pem)"
+INTERNAL_SECRET="$(openssl rand -hex 32)"
 ```
 
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+### 3. Start all services
 
-## Install Nx Console
+```bash
+docker-compose up
+```
 
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
+**Milestone:** `POST /auth/register` → `POST /auth/login` → JWT ✓
 
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+### Run a single service (hot reload)
 
-## Useful links
+```bash
+npx nx serve auth-service
+npx nx serve api-gateway
+```
 
-Learn more:
+### Debug in VSCode
 
-- [Learn more about this workspace setup](https://nx.dev/nx-api/js?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+Use the **Run and Debug** panel — launch configs for both services are in [.vscode/launch.json](.vscode/launch.json).
 
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+---
+
+## Running tests
+
+```bash
+# Unit tests (all affected)
+npx nx affected --target=test
+
+# All unit tests
+npx nx run-many --target=test
+
+# Integration tests (requires test infra)
+docker compose -f docker-compose.test.yml up -d --wait
+npm run test:integration
+docker compose -f docker-compose.test.yml down -v
+```
+
+Integration tests hit a real PostgreSQL (`localhost:5433`) and real RabbitMQ (`localhost:5673`) — no mocks.
+
+---
+
+## Build
+
+```bash
+# Single service
+npx nx build auth-service --configuration=production
+
+# All services
+npx nx run-many --target=build --configuration=production
+```
+
+---
+
+## Docs
+
+| File | Contents |
+|---|---|
+| [`docs/services.md`](docs/services.md) | Service contracts, DB tables, all endpoints + events |
+| [`docs/edge-cases.md`](docs/edge-cases.md) | Known gotchas + implementation patterns |
+| [`docs/roadmap.md`](docs/roadmap.md) | Phased build plan |
+| [`docs/frontend.md`](docs/frontend.md) | MFE architecture + shared libs |
+| [`docs/billing.md`](docs/billing.md) | Stripe setup, plan tiers, webhook handling |
+| [`docs/deployment.md`](docs/deployment.md) | Coolify + Docker Compose + Traefik |
+| [`docs/ai-features.md`](docs/ai-features.md) | Claude API usage, cost model, rate limits |
