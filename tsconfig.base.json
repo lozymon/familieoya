@@ -16,6 +16,10 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "es2022",
-    "customConditions": ["@familieoya/source"]
+    "paths": {
+      "@familieoya/contracts": ["libs/contracts/src/index.ts"],
+      "@familieoya/common": ["libs/common/src/index.ts"],
+      "@familieoya/testing": ["libs/testing/src/index.ts"]
+    }
   }
 }
