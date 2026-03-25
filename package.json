@@ -95,6 +95,7 @@
   ],
   "scripts": {
     "test:integration": "jest --config=jest.integration.config.js --runInBand",
+    "test:integration:full": "bash scripts/test-integration.sh",
     "frontend:build-remotes": "npx nx run-many --target=vite-build --projects=mfe-auth,mfe-transaction,mfe-household,mfe-budget",
     "frontend:preview-remotes": "npx nx run-many --target=preview --projects=mfe-auth,mfe-transaction,mfe-household,mfe-budget",
     "frontend:dev": "npm run frontend:build-remotes && concurrently \"npm run frontend:preview-remotes\" \"npx nx serve shell\""
