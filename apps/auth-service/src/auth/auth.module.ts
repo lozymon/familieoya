@@ -16,8 +16,12 @@ import { InternalApiGuard } from '@familieoya/common';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
-        privateKey: config.getOrThrow<string>('JWT_PRIVATE_KEY').replace(/\\n/g, '\n'),
-        publicKey: config.getOrThrow<string>('JWT_PUBLIC_KEY').replace(/\\n/g, '\n'),
+        privateKey: config
+          .getOrThrow<string>('JWT_PRIVATE_KEY')
+          .replace(/\\n/g, '\n'),
+        publicKey: config
+          .getOrThrow<string>('JWT_PUBLIC_KEY')
+          .replace(/\\n/g, '\n'),
         signOptions: { algorithm: 'RS256', expiresIn: '15m' },
       }),
     }),

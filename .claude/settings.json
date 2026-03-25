@@ -1,13 +1,7 @@
 {
   "permissions": {
-    "allow": [
-      "Bash(npx nx *)",
-      "Bash(git diff *)",
-      "Bash(git log *)"
-    ],
-    "deny": [
-      "Edit(.env*)"
-    ]
+    "allow": ["Bash(npx nx *)", "Bash(git diff *)", "Bash(git log *)"],
+    "deny": ["Edit(.env*)"]
   },
   "hooks": {
     "PreToolUse": [

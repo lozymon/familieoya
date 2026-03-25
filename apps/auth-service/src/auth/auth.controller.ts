@@ -50,21 +50,21 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const rawToken = req.cookies?.[REFRESH_COOKIE] as string | undefined;
-    const userId = (req.headers['x-user-id'] as string | undefined);
+    const userId = req.headers['x-user-id'] as string | undefined;
 
     if (!rawToken || !userId) throw new UnauthorizedException();
 
-    const { accessToken, refreshToken } = await this.authService.refresh(userId, rawToken);
+    const { accessToken, refreshToken } = await this.authService.refresh(
+      userId,
+      rawToken,
+    );
     res.cookie(REFRESH_COOKIE, refreshToken, COOKIE_OPTIONS);
     return { accessToken };
   }
 
   @Post('logout')
   @HttpCode(204)
-  async logout(
-    @Req() req: Request,
-    @Res({ passthrough: true }) res: Response,
-  ) {
+  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const rawToken = req.cookies?.[REFRESH_COOKIE] as string | undefined;
     const userId = req.headers['x-user-id'] as string | undefined;
 
@@ -83,7 +83,9 @@ export class AuthController {
   /** Internal endpoint — used by notification-service before sending email */
   @Get('internal/users/:userId/notification-preferences')
   @UseGuards(InternalApiGuard)
-  async getNotificationPreferences(@Req() req: Request & { params: { userId: string } }) {
+  async getNotificationPreferences(
+    @Req() req: Request & { params: { userId: string } },
+  ) {
     const user = await this.authService.getProfile(req.params.userId);
     return {
       budgetAlerts: user.budgetAlerts,

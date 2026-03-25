@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # required for nx affected
+          fetch-depth: 0 # required for nx affected
 
       - uses: actions/setup-node@v4
         with:
@@ -20,7 +20,7 @@ jobs:
 
       - run: npm ci --legacy-peer-deps
 
-      - uses: nrwl/nx-set-shas@v4  # sets NX_BASE + NX_HEAD for affected
+      - uses: nrwl/nx-set-shas@v4 # sets NX_BASE + NX_HEAD for affected
 
       - run: npx nx affected --target=lint --parallel=3
       - run: npx nx affected --target=test --parallel=3

@@ -11,7 +11,12 @@ import { ClientProxy } from '@nestjs/microservices';
 import * as bcrypt from 'bcrypt';
 import { User } from '../users/user.entity';
 import { RefreshToken } from '../users/refresh-token.entity';
-import { RegisterDto, LoginDto, USER_REGISTERED, UserRegisteredEvent } from '@familieoya/contracts';
+import {
+  RegisterDto,
+  LoginDto,
+  USER_REGISTERED,
+  UserRegisteredEvent,
+} from '@familieoya/contracts';
 
 const BCRYPT_ROUNDS = 10;
 const REFRESH_TOKEN_TTL_DAYS = 30;
@@ -53,7 +58,9 @@ export class AuthService {
     return { userId: user.id, email: user.email };
   }
 
-  async login(dto: LoginDto): Promise<{ accessToken: string; refreshToken: string }> {
+  async login(
+    dto: LoginDto,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
     const user = await this.users.findOne({ where: { email: dto.email } });
     if (!user) throw new UnauthorizedException('Invalid credentials');
 

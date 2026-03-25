@@ -16,7 +16,10 @@ import { RefreshToken } from '../users/refresh-token.entity';
         url: config.getOrThrow<string>('DATABASE_URL'),
         entities: [User, RefreshToken],
         synchronize: process.env.NODE_ENV !== 'production',
-        ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+        ssl:
+          process.env.NODE_ENV === 'production'
+            ? { rejectUnauthorized: false }
+            : false,
       }),
     }),
     AuthModule,

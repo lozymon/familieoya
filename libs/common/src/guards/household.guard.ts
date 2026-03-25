@@ -23,7 +23,9 @@ export class HouseholdGuard implements CanActivate {
     }
 
     const userId: string = request.user?.sub;
-    const householdUrl = this.config.getOrThrow<string>('HOUSEHOLD_SERVICE_URL');
+    const householdUrl = this.config.getOrThrow<string>(
+      'HOUSEHOLD_SERVICE_URL',
+    );
     const internalSecret = this.config.getOrThrow<string>('INTERNAL_SECRET');
 
     const { data } = await firstValueFrom(

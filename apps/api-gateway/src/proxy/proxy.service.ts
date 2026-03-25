@@ -36,7 +36,8 @@ export class ProxyService {
     if (req.householdId) headers['x-household-id'] = req.householdId;
     // Remove auth header — downstream services use x-user-id instead
     delete headers['authorization'];
-    headers['x-internal-secret'] = this.config.getOrThrow<string>('INTERNAL_SECRET');
+    headers['x-internal-secret'] =
+      this.config.getOrThrow<string>('INTERNAL_SECRET');
 
     const upstream = await firstValueFrom(
       this.http.request({

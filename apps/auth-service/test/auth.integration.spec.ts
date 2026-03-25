@@ -46,7 +46,11 @@ describe('auth-service — register → login → token flow', () => {
     it('returns 201 with userId and email', async () => {
       const res = await request(app.getHttpServer())
         .post('/auth/register')
-        .send({ name: 'Test User', email: 'test@example.com', password: 'password123' });
+        .send({
+          name: 'Test User',
+          email: 'test@example.com',
+          password: 'password123',
+        });
 
       expect(res.status).toBe(201);
       expect(res.body.userId).toBeDefined();
@@ -56,11 +60,19 @@ describe('auth-service — register → login → token flow', () => {
     it('returns 409 when email is already registered', async () => {
       await request(app.getHttpServer())
         .post('/auth/register')
-        .send({ name: 'First', email: 'dupe@example.com', password: 'password123' });
+        .send({
+          name: 'First',
+          email: 'dupe@example.com',
+          password: 'password123',
+        });
 
       const res = await request(app.getHttpServer())
         .post('/auth/register')
-        .send({ name: 'Second', email: 'dupe@example.com', password: 'password123' });
+        .send({
+          name: 'Second',
+          email: 'dupe@example.com',
+          password: 'password123',
+        });
 
       expect(res.status).toBe(409);
     });
@@ -86,7 +98,11 @@ describe('auth-service — register → login → token flow', () => {
     beforeEach(async () => {
       await request(app.getHttpServer())
         .post('/auth/register')
-        .send({ name: 'Login Test', email: 'login@example.com', password: 'password123' });
+        .send({
+          name: 'Login Test',
+          email: 'login@example.com',
+          password: 'password123',
+        });
     });
 
     it('returns an RS256 access token with correct claims', async () => {
@@ -114,7 +130,9 @@ describe('auth-service — register → login → token flow', () => {
 
       const cookies = res.headers['set-cookie'] as string[];
       expect(cookies).toBeDefined();
-      const refreshCookie = cookies.find((c: string) => c.startsWith('refresh_token='));
+      const refreshCookie = cookies.find((c: string) =>
+        c.startsWith('refresh_token='),
+      );
       expect(refreshCookie).toBeDefined();
       expect(refreshCookie).toMatch(/HttpOnly/i);
     });
@@ -143,7 +161,11 @@ describe('auth-service — register → login → token flow', () => {
     beforeEach(async () => {
       const reg = await request(app.getHttpServer())
         .post('/auth/register')
-        .send({ name: 'Refresh Test', email: 'refresh@example.com', password: 'password123' });
+        .send({
+          name: 'Refresh Test',
+          email: 'refresh@example.com',
+          password: 'password123',
+        });
       userId = reg.body.userId as string;
 
       const login = await request(app.getHttpServer())
@@ -151,7 +173,9 @@ describe('auth-service — register → login → token flow', () => {
         .send({ email: 'refresh@example.com', password: 'password123' });
 
       const cookies = login.headers['set-cookie'] as string[];
-      refreshTokenCookie = cookies.find((c: string) => c.startsWith('refresh_token='))!;
+      refreshTokenCookie = cookies.find((c: string) =>
+        c.startsWith('refresh_token='),
+      )!;
     });
 
     it('returns a new access token and rotates the refresh cookie', async () => {
@@ -164,7 +188,9 @@ describe('auth-service — register → login → token flow', () => {
       expect(res.body.accessToken).toBeDefined();
 
       const newCookies = res.headers['set-cookie'] as string[];
-      const newRefreshCookie = newCookies.find((c: string) => c.startsWith('refresh_token='));
+      const newRefreshCookie = newCookies.find((c: string) =>
+        c.startsWith('refresh_token='),
+      );
       expect(newRefreshCookie).toBeDefined();
       // New cookie value should differ from the old one
       expect(newRefreshCookie).not.toBe(refreshTokenCookie);
@@ -191,7 +217,11 @@ describe('auth-service — register → login → token flow', () => {
     it('returns user profile for a known userId', async () => {
       const reg = await request(app.getHttpServer())
         .post('/auth/register')
-        .send({ name: 'Profile User', email: 'me@example.com', password: 'password123' });
+        .send({
+          name: 'Profile User',
+          email: 'me@example.com',
+          password: 'password123',
+        });
 
       const res = await request(app.getHttpServer())
         .get('/auth/me')

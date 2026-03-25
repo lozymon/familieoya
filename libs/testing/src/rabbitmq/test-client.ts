@@ -36,12 +36,16 @@ export async function createTestRabbitMQClient(
           reject(new Error(`Timed out waiting for event on queue: ${queue}`));
         }, timeoutMs);
 
-        channel.consume(queue, (msg) => {
-          if (!msg) return;
-          clearTimeout(timer);
-          channel.ack(msg);
-          resolve(JSON.parse(msg.content.toString()) as unknown);
-        }, { noAck: false });
+        channel.consume(
+          queue,
+          (msg) => {
+            if (!msg) return;
+            clearTimeout(timer);
+            channel.ack(msg);
+            resolve(JSON.parse(msg.content.toString()) as unknown);
+          },
+          { noAck: false },
+        );
       });
     },
 
