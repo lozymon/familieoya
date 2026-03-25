@@ -13,10 +13,12 @@ export default defineConfig(async () => {
       federation({
         name: 'shell',
         remotes: {
-          'mfe-auth': 'http://localhost:4201/assets/remoteEntry.js',
-          'mfe-transaction': 'http://localhost:4202/assets/remoteEntry.js',
-          'mfe-household': 'http://localhost:4203/assets/remoteEntry.js',
-          'mfe-budget': 'http://localhost:4204/assets/remoteEntry.js',
+          'mfe-auth': 'http://localhost/remotes/auth/assets/remoteEntry.js',
+          'mfe-transaction':
+            'http://localhost/remotes/transaction/assets/remoteEntry.js',
+          'mfe-household':
+            'http://localhost/remotes/household/assets/remoteEntry.js',
+          'mfe-budget': 'http://localhost/remotes/budget/assets/remoteEntry.js',
         },
         shared: {
           react: { singleton: true, requiredVersion: '^19.0.0' },

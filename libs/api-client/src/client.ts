@@ -17,11 +17,7 @@ export function setHouseholdIdAccessor(getter: () => string | null) {
 }
 
 export const apiClient: AxiosInstance = axios.create({
-  baseURL:
-    typeof window !== 'undefined'
-      ? ((window as unknown as Record<string, Record<string, string>>).__ENV__
-          ?.VITE_API_URL ?? 'http://localhost:3000')
-      : 'http://localhost:3000',
+  baseURL: '/api',
   withCredentials: true, // send httpOnly refresh cookie
 });
 
