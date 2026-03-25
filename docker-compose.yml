@@ -10,11 +10,14 @@ services:
       JWT_PUBLIC_KEY: ${JWT_PUBLIC_KEY}
       AUTH_SERVICE_URL: http://auth-service:3001
       HOUSEHOLD_SERVICE_URL: http://household-service:3002
+      TRANSACTION_SERVICE_URL: http://transaction-service:3003
       INTERNAL_SECRET: ${INTERNAL_SECRET}
     depends_on:
       auth-service:
         condition: service_healthy
       household-service:
+        condition: service_healthy
+      transaction-service:
         condition: service_healthy
     networks:
       - familieoya
@@ -100,6 +103,31 @@ services:
     networks:
       - familieoya
 
+  transaction-service:
+    build:
+      context: .
+      dockerfile: apps/transaction-service/Dockerfile
+    ports:
+      - '3003:3003'
+    environment:
+      PORT: 3003
+      NODE_ENV: production
+      DATABASE_URL: postgres://transaction:transaction@postgres-transaction:5432/transaction_db
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      INTERNAL_SECRET: ${INTERNAL_SECRET}
+    depends_on:
+      postgres-transaction:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:3003/health']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - familieoya
+
   notification-service:
     build:
       context: .
@@ -137,9 +165,26 @@ services:
     networks:
       - familieoya
 
+  postgres-transaction:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: transaction_db
+      POSTGRES_USER: transaction
+      POSTGRES_PASSWORD: transaction
+    volumes:
+      - postgres-transaction-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U transaction -d transaction_db']
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - familieoya
+
 volumes:
   postgres-auth-data:
   postgres-household-data:
+  postgres-transaction-data:
 
 networks:
   familieoya:
