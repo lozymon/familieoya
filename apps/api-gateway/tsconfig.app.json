@@ -15,6 +15,9 @@
   "exclude": [],
   "references": [
     {
+      "path": "../../libs/contracts/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/common/tsconfig.lib.json"
     }
   ]

@@ -1,0 +1,12 @@
+{
+  "name": "@familieoya/mfe-auth",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "name": "mfe-auth"
+  },
+  "dependencies": {
+    "@familieoya/api-client": "*",
+    "@familieoya/ui": "*"
+  }
+}

@@ -29,6 +29,33 @@
     },
     {
       "path": "./apps/household-service"
+    },
+    {
+      "path": "./apps/transaction-service"
+    },
+    {
+      "path": "./apps/budget-service"
+    },
+    {
+      "path": "./libs/ui"
+    },
+    {
+      "path": "./libs/api-client"
+    },
+    {
+      "path": "./apps/shell"
+    },
+    {
+      "path": "./apps/mfe-auth"
+    },
+    {
+      "path": "./apps/mfe-transaction"
+    },
+    {
+      "path": "./apps/mfe-household"
+    },
+    {
+      "path": "./apps/mfe-budget"
     }
   ]
 }

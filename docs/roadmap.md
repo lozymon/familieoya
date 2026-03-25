@@ -177,7 +177,7 @@ _Goal: Real emails, in-app notifications, clean UX for portfolio_
 - [x] Write integration tests covering notification persist, REST, and event publish flows
 - [x] Add `@WebSocketGateway` to api-gateway — JWT handshake auth, userId→socket map, consume `notification.created` events and push to connected client
 - [x] Publish `notification.created` event from notification-service after persisting each in-app notification
-- [ ] Connect shell to WebSocket on login — update TanStack Query notification cache on incoming events (Phase 6 frontend)
+- [x] Connect shell to WebSocket on login — update TanStack Query notification cache on incoming events (Phase 6 frontend)
 - [x] Add weekly spending digest cron (`@Cron('0 8 * * MON')`) to notification-service — queries household-service, sends Monday morning email to opted-in members
 - [x] Add `weeklyDigest` boolean to notification preferences (auth-service) — `GET/PATCH /auth/me/notification-preferences` endpoints added
 - [x] Add `GET /internal/households/active` to household-service for digest use
@@ -189,15 +189,15 @@ _Goal: Real emails, in-app notifications, clean UX for portfolio_
 
 _Goal: Working frontend skeleton with login flow_
 
-- [ ] Scaffold Vite monorepo apps: `shell`, `mfe-auth`, `mfe-transaction`, `mfe-household`, `mfe-budget`
-- [ ] Set up `libs/ui` with shared Tailwind config + base shadcn/ui components
-- [ ] Set up `libs/api-client` with typed functions for auth endpoints
-- [ ] Configure Module Federation in shell + `mfe-auth`
-- [ ] Shell: sidebar layout, top bar, notification bell placeholder, React Router routes
-- [ ] Auth MFE: login page, register page, profile page
-- [ ] Shell: JWT auth context (access token in memory, refresh token in httpOnly cookie)
-- [ ] Auto-refresh token on 401 (transparent retry via TanStack Query)
-- [ ] Add frontend services to Docker Compose
+- [x] Scaffold Vite monorepo apps: `shell`, `mfe-auth`, `mfe-transaction`, `mfe-household`, `mfe-budget`
+- [x] Set up `libs/ui` with shared Tailwind config + base shadcn/ui components
+- [x] Set up `libs/api-client` with typed functions for auth endpoints
+- [x] Configure Module Federation in shell + `mfe-auth`
+- [x] Shell: sidebar layout, top bar, notification bell placeholder, React Router routes
+- [x] Auth MFE: login page, register page, profile page
+- [x] Shell: JWT auth context (access token in memory, refresh token in httpOnly cookie)
+- [x] Auto-refresh token on 401 (transparent retry via TanStack Query)
+- [x] Add frontend services to Docker Compose
 
 **Milestone:** `docker-compose up` → can register, log in, see the shell layout
 

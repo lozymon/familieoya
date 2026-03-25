@@ -1,0 +1,23 @@
+{
+  "name": "@familieoya/api-client",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "name": "api-client"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "@familieoya/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "peerDependencies": {
+    "axios": "^1.6.0",
+    "socket.io-client": "^4.7.0"
+  }
+}

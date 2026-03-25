@@ -1,0 +1,12 @@
+{
+  "name": "@familieoya/shell",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "name": "shell"
+  },
+  "dependencies": {
+    "@familieoya/api-client": "*",
+    "@familieoya/ui": "*"
+  }
+}

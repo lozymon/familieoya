@@ -32,6 +32,15 @@
         "watchDepsTargetName": "watch-deps",
         "serveStaticTargetName": "serve-static"
       }
+    },
+    {
+      "plugin": "@nx/vite/plugin",
+      "options": {
+        "buildTargetName": "vite-build",
+        "serveTargetName": "serve",
+        "previewTargetName": "preview",
+        "testTargetName": "test"
+      }
     }
   ]
 }

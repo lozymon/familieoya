@@ -37,7 +37,7 @@ services:
       - '3001:3001'
     environment:
       PORT: 3001
-      NODE_ENV: production
+      NODE_ENV: development
       DATABASE_URL: postgres://auth:auth@postgres-auth:5432/auth_db
       JWT_PRIVATE_KEY: ${JWT_PRIVATE_KEY}
       JWT_PUBLIC_KEY: ${JWT_PUBLIC_KEY}
@@ -93,7 +93,7 @@ services:
       - '3002:3002'
     environment:
       PORT: 3002
-      NODE_ENV: production
+      NODE_ENV: development
       DATABASE_URL: postgres://household:household@postgres-household:5432/household_db
       RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
       INTERNAL_SECRET: ${INTERNAL_SECRET}
@@ -118,7 +118,7 @@ services:
       - '3003:3003'
     environment:
       PORT: 3003
-      NODE_ENV: production
+      NODE_ENV: development
       DATABASE_URL: postgres://transaction:transaction@postgres-transaction:5432/transaction_db
       RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
       INTERNAL_SECRET: ${INTERNAL_SECRET}
@@ -143,7 +143,7 @@ services:
       - '3004:3004'
     environment:
       PORT: 3004
-      NODE_ENV: production
+      NODE_ENV: development
       DATABASE_URL: postgres://budget:budget@postgres-budget:5432/budget_db
       RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
     depends_on:
@@ -167,7 +167,7 @@ services:
       - '3005:3005'
     environment:
       PORT: 3005
-      NODE_ENV: production
+      NODE_ENV: development
       DATABASE_URL: postgres://notification:notification@postgres-notification:5432/notification_db
       RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
       AUTH_SERVICE_URL: http://auth-service:3001
@@ -254,6 +254,54 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
+    networks:
+      - familieoya
+
+  shell:
+    build:
+      context: .
+      dockerfile: apps/shell/Dockerfile
+    ports:
+      - '4200:80'
+    depends_on:
+      api-gateway:
+        condition: service_healthy
+    networks:
+      - familieoya
+
+  mfe-auth:
+    build:
+      context: .
+      dockerfile: apps/mfe-auth/Dockerfile
+    ports:
+      - '4201:80'
+    networks:
+      - familieoya
+
+  mfe-transaction:
+    build:
+      context: .
+      dockerfile: apps/mfe-transaction/Dockerfile
+    ports:
+      - '4202:80'
+    networks:
+      - familieoya
+
+  mfe-household:
+    build:
+      context: .
+      dockerfile: apps/mfe-household/Dockerfile
+    ports:
+      - '4203:80'
+    networks:
+      - familieoya
+
+  mfe-budget:
+    build:
+      context: .
+      dockerfile: apps/mfe-budget/Dockerfile
+    ports:
+      - '4204:80'
     networks:
       - familieoya
 
