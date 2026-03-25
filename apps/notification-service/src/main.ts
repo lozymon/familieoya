@@ -1,21 +1,29 @@
-import { Logger } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { AppModule } from './app/app.module';
 
 async function bootstrap() {
-  // HTTP server (health check)
   const app = await NestFactory.create(AppModule);
 
-  // RabbitMQ consumer
+  app.useGlobalPipes(
+    new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }),
+  );
+
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,
     options: {
       urls: [process.env.RABBITMQ_URL ?? 'amqp://guest:guest@localhost:5672'],
       exchange: 'familieoya',
       exchangeType: 'topic',
-      queue: 'notification-service',
-      queueOptions: { durable: true },
+      queue: 'notification-service.queue',
+      queueOptions: {
+        durable: true,
+        arguments: {
+          'x-dead-letter-exchange': 'familieoya.dlq',
+          'x-dead-letter-routing-key': 'notification-service.queue.dlq',
+        },
+      },
       noAck: false,
     },
   });

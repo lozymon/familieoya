@@ -169,18 +169,19 @@ _Goal: The core portfolio-worthy architecture piece_
 
 _Goal: Real emails, in-app notifications, clean UX for portfolio_
 
-- [ ] Persist notifications in `notification-service` DB
-- [ ] Add GET `/notifications` + mark-as-read endpoints
-- [ ] Send real emails (welcome, invitation, budget alerts) via Resend or Nodemailer
-- [ ] Consume `user.registered` → welcome email
-- [ ] Add health check endpoints to all services (`/health`)
-- [ ] Write e2e test covering the full user journey
-- [ ] Add `@WebSocketGateway` to api-gateway — JWT handshake auth, userId→socket map, consume `notification.created` events and push to connected client
-- [ ] Publish `notification.created` event from notification-service after persisting each in-app notification
-- [ ] Connect shell to WebSocket on login — update TanStack Query notification cache on incoming events
-- [ ] Add weekly spending digest cron (`@Cron('0 8 * * MON')`) to notification-service — queries household-service + report-service, sends Monday morning email to opted-in members
-- [ ] Add `weeklyDigest` boolean to notification preferences (auth-service) — default true, exposed in `mfe-settings` Notifications page
-- [ ] Add `GET /internal/households/active` to household-service for digest use
+- [x] Persist notifications in `notification-service` DB
+- [x] Add GET `/notifications` + mark-as-read endpoints
+- [x] Send real emails (welcome, invitation, budget alerts) via Nodemailer
+- [x] Consume `user.registered` → welcome email
+- [x] Health check endpoints present on all services (`/health`)
+- [x] Write integration tests covering notification persist, REST, and event publish flows
+- [x] Add `@WebSocketGateway` to api-gateway — JWT handshake auth, userId→socket map, consume `notification.created` events and push to connected client
+- [x] Publish `notification.created` event from notification-service after persisting each in-app notification
+- [ ] Connect shell to WebSocket on login — update TanStack Query notification cache on incoming events (Phase 6 frontend)
+- [x] Add weekly spending digest cron (`@Cron('0 8 * * MON')`) to notification-service — queries household-service, sends Monday morning email to opted-in members
+- [x] Add `weeklyDigest` boolean to notification preferences (auth-service) — `GET/PATCH /auth/me/notification-preferences` endpoints added
+- [x] Add `GET /internal/households/active` to household-service for digest use
+- [x] Add `GET /internal/households/:id/members` to household-service for per-event email delivery
 
 ---
 

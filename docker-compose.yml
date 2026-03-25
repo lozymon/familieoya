@@ -12,6 +12,8 @@ services:
       HOUSEHOLD_SERVICE_URL: http://household-service:3002
       TRANSACTION_SERVICE_URL: http://transaction-service:3003
       BUDGET_SERVICE_URL: http://budget-service:3004
+      NOTIFICATION_SERVICE_URL: http://notification-service:3005
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
       INTERNAL_SECRET: ${INTERNAL_SECRET}
     depends_on:
       auth-service:
@@ -21,6 +23,8 @@ services:
       transaction-service:
         condition: service_healthy
       budget-service:
+        condition: service_healthy
+      notification-service:
         condition: service_healthy
     networks:
       - familieoya
@@ -164,14 +168,43 @@ services:
     environment:
       PORT: 3005
       NODE_ENV: production
+      DATABASE_URL: postgres://notification:notification@postgres-notification:5432/notification_db
       RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      AUTH_SERVICE_URL: http://auth-service:3001
+      HOUSEHOLD_SERVICE_URL: http://household-service:3002
+      INTERNAL_SECRET: ${INTERNAL_SECRET}
+      SMTP_HOST: ${SMTP_HOST:-localhost}
+      SMTP_PORT: ${SMTP_PORT:-1025}
+      SMTP_SECURE: ${SMTP_SECURE:-false}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      MAILER_FROM: ${MAILER_FROM:-noreply@familieoya.no}
+      APP_BASE_URL: ${APP_BASE_URL:-https://app.familieoya.furevikstrand.cloud}
     depends_on:
+      postgres-notification:
+        condition: service_healthy
       rabbitmq:
         condition: service_healthy
     healthcheck:
       test: ['CMD', 'wget', '-qO-', 'http://localhost:3005/health']
       interval: 10s
       timeout: 5s
+      retries: 5
+    networks:
+      - familieoya
+
+  postgres-notification:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: notification_db
+      POSTGRES_USER: notification
+      POSTGRES_PASSWORD: notification
+    volumes:
+      - postgres-notification-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U notification -d notification_db']
+      interval: 5s
+      timeout: 3s
       retries: 5
     networks:
       - familieoya
@@ -229,6 +262,7 @@ volumes:
   postgres-household-data:
   postgres-transaction-data:
   postgres-budget-data:
+  postgres-notification-data:
 
 networks:
   familieoya:

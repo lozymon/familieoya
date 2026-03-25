@@ -113,6 +113,33 @@ export class AuthService {
     return profile;
   }
 
+  async updateNotificationPreferences(
+    userId: string,
+    prefs: {
+      budgetAlerts?: boolean;
+      householdUpdates?: boolean;
+      weeklyDigest?: boolean;
+    },
+  ): Promise<{
+    budgetAlerts: boolean;
+    householdUpdates: boolean;
+    weeklyDigest: boolean;
+  }> {
+    const user = await this.users.findOneOrFail({ where: { id: userId } });
+    if (prefs.budgetAlerts !== undefined)
+      user.budgetAlerts = prefs.budgetAlerts;
+    if (prefs.householdUpdates !== undefined)
+      user.householdUpdates = prefs.householdUpdates;
+    if (prefs.weeklyDigest !== undefined)
+      user.weeklyDigest = prefs.weeklyDigest;
+    await this.users.save(user);
+    return {
+      budgetAlerts: user.budgetAlerts,
+      householdUpdates: user.householdUpdates,
+      weeklyDigest: user.weeklyDigest,
+    };
+  }
+
   private async issueTokens(
     user: User,
   ): Promise<{ accessToken: string; refreshToken: string }> {

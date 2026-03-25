@@ -8,7 +8,9 @@ import { ProxyService } from '../proxy/proxy.service';
 import { AuthController } from '../auth/auth.controller';
 import { HouseholdController } from '../households/household.controller';
 import { BudgetController } from '../budgets/budget.controller';
+import { NotificationController } from '../notifications/notification.controller';
 import { HealthController } from '../health/health.controller';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
   imports: [
@@ -16,11 +18,13 @@ import { HealthController } from '../health/health.controller';
     PassportModule,
     HttpModule,
     ThrottlerModule.forRoot([{ name: 'global', ttl: 60000, limit: 100 }]),
+    NotificationsModule,
   ],
   controllers: [
     AuthController,
     HouseholdController,
     BudgetController,
+    NotificationController,
     HealthController,
   ],
   providers: [

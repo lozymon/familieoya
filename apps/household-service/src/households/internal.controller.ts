@@ -7,6 +7,15 @@ import { HouseholdService } from './household.service';
 export class InternalController {
   constructor(private readonly service: HouseholdService) {}
 
+  /** Used by notification-service to fetch member IDs for a household. */
+  @Get('households/:householdId/members')
+  async getHouseholdMembers(
+    @Param('householdId') householdId: string,
+  ): Promise<{ memberIds: string[] }> {
+    const memberIds = await this.service.getHouseholdMemberIds(householdId);
+    return { memberIds };
+  }
+
   /** Used by HouseholdGuard in api-gateway to validate membership. */
   @Get('households/:householdId/members/:userId')
   async checkMembership(

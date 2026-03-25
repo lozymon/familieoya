@@ -244,6 +244,12 @@ export class HouseholdService {
     return !!member;
   }
 
+  /** Used by notification-service to send per-member emails. */
+  async getHouseholdMemberIds(householdId: string): Promise<string[]> {
+    const rows = await this.members.find({ where: { householdId } });
+    return rows.map((m) => m.userId);
+  }
+
   async getActiveHouseholds(): Promise<{ id: string; memberIds: string[] }[]> {
     const allMembers = await this.members.find();
     const map = new Map<string, string[]>();

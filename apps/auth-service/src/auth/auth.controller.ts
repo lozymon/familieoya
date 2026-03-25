@@ -3,6 +3,8 @@ import {
   Controller,
   Get,
   HttpCode,
+  Param,
+  Patch,
   Post,
   Req,
   Res,
@@ -80,16 +82,41 @@ export class AuthController {
     return this.authService.getProfile(userId);
   }
 
-  /** Internal endpoint — used by notification-service before sending email */
-  @Get('internal/users/:userId/notification-preferences')
-  @UseGuards(InternalApiGuard)
-  async getNotificationPreferences(
-    @Req() req: Request & { params: { userId: string } },
-  ) {
-    const user = await this.authService.getProfile(req.params.userId);
+  @Get('me/notification-preferences')
+  async getMyNotificationPreferences(@Req() req: Request) {
+    const userId = req.headers['x-user-id'] as string;
+    const user = await this.authService.getProfile(userId);
     return {
       budgetAlerts: user.budgetAlerts,
       householdUpdates: user.householdUpdates,
+      weeklyDigest: user.weeklyDigest,
+    };
+  }
+
+  @Patch('me/notification-preferences')
+  updateMyNotificationPreferences(
+    @Req() req: Request,
+    @Body()
+    body: {
+      budgetAlerts?: boolean;
+      householdUpdates?: boolean;
+      weeklyDigest?: boolean;
+    },
+  ) {
+    const userId = req.headers['x-user-id'] as string;
+    return this.authService.updateNotificationPreferences(userId, body);
+  }
+
+  /** Internal endpoint — used by notification-service before sending email */
+  @Get('internal/users/:userId/notification-preferences')
+  @UseGuards(InternalApiGuard)
+  async getNotificationPreferences(@Param('userId') userId: string) {
+    const user = await this.authService.getProfile(userId);
+    return {
+      email: user.email,
+      budgetAlerts: user.budgetAlerts,
+      householdUpdates: user.householdUpdates,
+      weeklyDigest: user.weeklyDigest,
       preferredLanguage: user.preferredLanguage,
     };
   }
