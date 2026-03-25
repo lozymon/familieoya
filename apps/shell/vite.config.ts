@@ -1,10 +1,13 @@
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import federation from '@originjs/vite-plugin-federation';
 
-export default defineConfig(async () => {
+export default defineConfig(async ({ mode }) => {
   // Dynamic import required — @tailwindcss/vite is ESM-only
   const { default: tailwindcss } = await import('@tailwindcss/vite');
+
+  const env = loadEnv(mode, process.cwd(), '');
+  const proxyBase = env.VITE_PROXY_URL ?? 'http://localhost:8000';
 
   return {
     plugins: [
@@ -13,14 +16,10 @@ export default defineConfig(async () => {
       federation({
         name: 'shell',
         remotes: {
-          'mfe-auth':
-            'http://localhost:8000/remotes/auth/assets/remoteEntry.js',
-          'mfe-transaction':
-            'http://localhost:8000/remotes/transaction/assets/remoteEntry.js',
-          'mfe-household':
-            'http://localhost:8000/remotes/household/assets/remoteEntry.js',
-          'mfe-budget':
-            'http://localhost:8000/remotes/budget/assets/remoteEntry.js',
+          'mfe-auth': `${proxyBase}/remotes/auth/assets/remoteEntry.js`,
+          'mfe-transaction': `${proxyBase}/remotes/transaction/assets/remoteEntry.js`,
+          'mfe-household': `${proxyBase}/remotes/household/assets/remoteEntry.js`,
+          'mfe-budget': `${proxyBase}/remotes/budget/assets/remoteEntry.js`,
         },
         shared: {
           react: { singleton: true, requiredVersion: '^19.0.0' },
