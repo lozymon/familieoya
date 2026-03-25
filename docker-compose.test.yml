@@ -45,6 +45,20 @@ services:
       timeout: 3s
       retries: 10
 
+  postgres-budget-test:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: budget_test
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+    ports:
+      - '5436:5432'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U test -d budget_test']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
   rabbitmq-test:
     image: rabbitmq:3-management-alpine
     ports:

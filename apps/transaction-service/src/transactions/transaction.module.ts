@@ -27,6 +27,7 @@ import { InternalApiGuard } from '@familieoya/common';
             urls: [config.getOrThrow<string>('RABBITMQ_URL')],
             exchange: 'familieoya',
             exchangeType: 'topic',
+            wildcards: true,
           },
         }),
       },

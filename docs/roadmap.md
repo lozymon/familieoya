@@ -146,16 +146,16 @@ _Goal: Core financial data entry working_
 
 _Goal: The core portfolio-worthy architecture piece_
 
-- [ ] Scaffold `budget-service` with PostgreSQL
-- [ ] Implement budget limit CRUD
-- [ ] Consume `transaction.*` events → maintain running spending totals
-- [ ] Configure `noAck: false` on all RabbitMQ consumers (manual ack required for idempotency)
-- [ ] Implement threshold detection (80% warning, 100% exceeded) with `budget_alert_state` deduplication table
-- [ ] Implement `processed_event_ids` table + `withIdempotency()` helper in budget-service and report-service
-- [ ] Publish `budget.threshold.warning` + `budget.threshold.exceeded`
-- [ ] Implement `/budgets/status` endpoint
-- [ ] Wire `notification-service` to consume budget events + send email (Nodemailer/Resend)
-- [ ] Write saga integration test:
+- [x] Scaffold `budget-service` with PostgreSQL
+- [x] Implement budget limit CRUD
+- [x] Consume `transaction.*` events → maintain running spending totals
+- [x] Configure `noAck: false` on all RabbitMQ consumers (manual ack required for idempotency)
+- [x] Implement threshold detection (80% warning, 100% exceeded) with `budget_alert_state` deduplication table
+- [x] Implement `processed_event_ids` table + `withIdempotency()` helper in budget-service and report-service
+- [x] Publish `budget.threshold.warning` + `budget.threshold.exceeded`
+- [x] Implement `/budgets/status` endpoint
+- [x] Wire `notification-service` to consume budget events + send email (Nodemailer/Resend)
+- [x] Write saga integration test:
   - Create transaction → assert `transaction.created` published
   - Assert budget-service updates spending total
   - Assert `budget.threshold.exceeded` published when over limit

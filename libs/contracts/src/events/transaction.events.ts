@@ -30,6 +30,8 @@ export interface TransactionDeletedEvent extends BaseEvent {
   categoryId: string;
   previousAmount: number;
   type: 'income' | 'expense';
+  /** ISO 8601 date of the deleted transaction — needed by budget-service to subtract from the correct month. */
+  date: string;
 }
 
 export const TRANSACTION_CREATED = 'transaction.created';

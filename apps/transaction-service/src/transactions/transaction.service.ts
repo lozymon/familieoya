@@ -162,6 +162,7 @@ export class TransactionService {
       categoryId: t.categoryId,
       previousAmount: t.amount,
       type: t.type,
+      date: t.date,
     };
     this.rmq.emit<void, TransactionDeletedEvent>(TRANSACTION_DELETED, event);
   }
@@ -183,6 +184,7 @@ export class TransactionService {
         categoryId: t.categoryId,
         previousAmount: t.amount,
         type: t.type,
+        date: t.date,
       };
       this.rmq.emit<void, TransactionDeletedEvent>(TRANSACTION_DELETED, event);
     }
