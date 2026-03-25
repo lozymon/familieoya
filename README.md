@@ -8,22 +8,30 @@ NestJS microservices backend, React 19 microfrontend (Module Federation), and a 
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                        api-gateway :3000                        │
+                        Browser / Mobile
+                               │
+              ┌────────────────▼─────────────────┐
+              │         nginx proxy :8000          │
+              │  /api/* → api-gateway              │
+              │  /socket.io/* → api-gateway (WS)   │
+              │  /remotes/* → MFE containers        │
+              │  /* → shell SPA                    │
+              └────────────────┬─────────────────┘
+                               │
+┌──────────────────────────────▼──────────────────────────────────┐
+│                         api-gateway                             │
 │   JWT validation · X-Household-ID check · rate limiting · proxy │
-└───────────┬──────────────────────────────┬──────────────────────┘
-            │                              │
-     ┌──────▼──────┐               ┌───────▼────────┐
-     │ auth-service│               │household-service│  ← Phase 2
-     │    :3001    │               │     :3002       │
-     └──────┬──────┘               └────────────────┘
-            │ RabbitMQ (topic exchange: familieoya)
-     ┌──────▼──────────────────────────────────────┐
-     │  notification · budget · transaction · audit │  ← later phases
-     └─────────────────────────────────────────────┘
+└──┬──────────┬──────────┬──────────┬──────────┬─────────────────┘
+   │          │          │          │          │
+auth      household  transaction  budget  notification
+:3001      :3002       :3003      :3004      :3005
+   │          │          │          │          │
+   └──────────┴──────────┴──────────┴──────────┘
+                  RabbitMQ (topic exchange: familieoya)
 ```
 
 **Key architecture rules:**
+
 - No `householdId` in JWT — client sends `X-Household-ID` header, gateway validates membership
 - Services never query each other's databases — RabbitMQ for async, HTTP for sync reads
 - All amounts are integers (øre/cents) — never store floats
@@ -38,11 +46,24 @@ See [`docs/services.md`](docs/services.md) for full service contracts and [`docs
 
 ```
 apps/
+  proxy/              ← nginx reverse proxy (port 8000 locally)
   api-gateway/        ← public entry point, JWT + proxy
   auth-service/       ← register, login, JWT issuance (RS256)
+  household-service/  ← households, members, invitations
+  transaction-service/← transactions, categories
+  budget-service/     ← budgets, spending totals, threshold alerts
+  notification-service/← in-app + email notifications, WebSocket gateway
+  shell/              ← React 19 MFE host (Module Federation)
+  mfe-auth/           ← login, register, profile pages
+  mfe-transaction/    ← transaction list, form, categories, dashboard
+  mfe-household/      ← household management, invitation flow
+  mfe-budget/         ← budget overview
 libs/
   contracts/          ← shared event interfaces + DTOs
   common/             ← JWT guard, HouseholdGuard, InternalApiGuard, decorators
+  api-client/         ← typed axios client used by all MFEs
+  ui/                 ← shared React components (Module Federation singleton)
+  i18n/               ← translations + formatDate/formatCurrency helpers
   testing/            ← resetDatabase(), createTestRabbitMQClient()
 docs/                 ← architecture docs (read before coding)
 ```
@@ -72,13 +93,23 @@ JWT_PUBLIC_KEY="$(awk 'NF {sub(/\r/, ""); printf "%s\\n",$0;}' auth_public.pem)"
 INTERNAL_SECRET="$(openssl rand -hex 32)"
 ```
 
-### 3. Start all services
+### 3. Set the proxy URL in `.env`
 
 ```bash
-docker-compose up
+VITE_PROXY_URL=http://localhost:8000
 ```
 
-**Milestone:** `POST /auth/register` → `POST /auth/login` → JWT ✓
+This is baked into the shell bundle at build time so MFEs can be resolved via the proxy.
+
+### 4. Start all services
+
+```bash
+docker compose up --build
+```
+
+The app is available at **http://localhost:8000**.
+
+**Milestone:** register → login → dashboard ✓
 
 ### Run a single service (hot reload)
 
@@ -96,19 +127,22 @@ Use the **Run and Debug** panel — launch configs for both services are in [.vs
 ## Running tests
 
 ```bash
-# Unit tests (all affected)
+# Unit tests (affected only)
 npx nx affected --target=test
 
 # All unit tests
 npx nx run-many --target=test
 
-# Integration tests (requires test infra)
+# Integration tests — starts infra, runs tests, tears down
+npm run test:integration:full
+
+# Or manually
 docker compose -f docker-compose.test.yml up -d --wait
 npm run test:integration
-docker compose -f docker-compose.test.yml down -v
+docker compose -f docker-compose.test.yml down
 ```
 
-Integration tests hit a real PostgreSQL (`localhost:5433`) and real RabbitMQ (`localhost:5673`) — no mocks.
+Integration tests hit a real PostgreSQL (`localhost:5433–5437`) and real RabbitMQ (`localhost:5673`) — no mocks.
 
 ---
 
@@ -126,12 +160,12 @@ npx nx run-many --target=build --configuration=production
 
 ## Docs
 
-| File | Contents |
-|---|---|
-| [`docs/services.md`](docs/services.md) | Service contracts, DB tables, all endpoints + events |
-| [`docs/edge-cases.md`](docs/edge-cases.md) | Known gotchas + implementation patterns |
-| [`docs/roadmap.md`](docs/roadmap.md) | Phased build plan |
-| [`docs/frontend.md`](docs/frontend.md) | MFE architecture + shared libs |
-| [`docs/billing.md`](docs/billing.md) | Stripe setup, plan tiers, webhook handling |
-| [`docs/deployment.md`](docs/deployment.md) | Coolify + Docker Compose + Traefik |
-| [`docs/ai-features.md`](docs/ai-features.md) | Claude API usage, cost model, rate limits |
+| File                                         | Contents                                             |
+| -------------------------------------------- | ---------------------------------------------------- |
+| [`docs/services.md`](docs/services.md)       | Service contracts, DB tables, all endpoints + events |
+| [`docs/edge-cases.md`](docs/edge-cases.md)   | Known gotchas + implementation patterns              |
+| [`docs/roadmap.md`](docs/roadmap.md)         | Phased build plan                                    |
+| [`docs/frontend.md`](docs/frontend.md)       | MFE architecture + shared libs                       |
+| [`docs/billing.md`](docs/billing.md)         | Stripe setup, plan tiers, webhook handling           |
+| [`docs/deployment.md`](docs/deployment.md)   | Coolify + Docker Compose + Traefik                   |
+| [`docs/ai-features.md`](docs/ai-features.md) | Claude API usage, cost model, rate limits            |
