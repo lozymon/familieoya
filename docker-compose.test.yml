@@ -73,6 +73,34 @@ services:
       timeout: 3s
       retries: 10
 
+  postgres-report-test:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: report_test
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+    ports:
+      - '5438:5432'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U test -d report_test']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  postgres-audit-test:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: audit_test
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+    ports:
+      - '5439:5432'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U test -d audit_test']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
   rabbitmq-test:
     image: rabbitmq:3-management-alpine
     ports:

@@ -8,3 +8,5 @@ export * from './households';
 export { connectNotificationSocket } from './notifications.ws';
 export { AuthContext } from './auth-context';
 export type { AuthContextValue } from './auth-context';
+export * from './reports';
+export * from './audit';

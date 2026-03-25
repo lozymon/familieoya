@@ -9,6 +9,8 @@ import { AuthController } from '../auth/auth.controller';
 import { HouseholdController } from '../households/household.controller';
 import { BudgetController } from '../budgets/budget.controller';
 import { NotificationController } from '../notifications/notification.controller';
+import { ReportController } from '../reports/report.controller';
+import { AuditController } from '../audit/audit.controller';
 import { HealthController } from '../health/health.controller';
 import { NotificationsModule } from '../notifications/notifications.module';
 
@@ -25,6 +27,8 @@ import { NotificationsModule } from '../notifications/notifications.module';
     HouseholdController,
     BudgetController,
     NotificationController,
+    ReportController,
+    AuditController,
     HealthController,
   ],
   providers: [

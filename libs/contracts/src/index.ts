@@ -4,5 +4,6 @@ export * from './events/household.events';
 export * from './events/transaction.events';
 export * from './events/budget.events';
 export * from './events/notification.events';
+export * from './events/report.events';
 export * from './dto/auth/register.dto';
 export * from './dto/auth/login.dto';

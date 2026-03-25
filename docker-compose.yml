@@ -18,6 +18,10 @@ services:
         condition: service_started
       mfe-budget:
         condition: service_started
+      mfe-reports:
+        condition: service_started
+      mfe-settings:
+        condition: service_started
     networks:
       - familieoya
 
@@ -33,6 +37,8 @@ services:
       TRANSACTION_SERVICE_URL: http://transaction-service:3003
       BUDGET_SERVICE_URL: http://budget-service:3004
       NOTIFICATION_SERVICE_URL: http://notification-service:3005
+      REPORT_SERVICE_URL: http://report-service:3006
+      AUDIT_SERVICE_URL: http://audit-service:3007
       RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
       INTERNAL_SECRET: ${INTERNAL_SECRET}
     depends_on:
@@ -45,6 +51,10 @@ services:
       budget-service:
         condition: service_healthy
       notification-service:
+        condition: service_healthy
+      report-service:
+        condition: service_healthy
+      audit-service:
         condition: service_healthy
     healthcheck:
       test: ['CMD', 'wget', '-qO-', 'http://localhost:3000/health']
@@ -330,12 +340,114 @@ services:
     networks:
       - familieoya
 
+  report-service:
+    build:
+      context: .
+      dockerfile: apps/report-service/Dockerfile
+    ports:
+      - '3006:3006'
+    environment:
+      PORT: 3006
+      NODE_ENV: development
+      DATABASE_URL: postgres://report:report@postgres-report:5432/report_db
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      INTERNAL_SECRET: ${INTERNAL_SECRET}
+    depends_on:
+      postgres-report:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:3006/health']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - familieoya
+
+  postgres-report:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: report_db
+      POSTGRES_USER: report
+      POSTGRES_PASSWORD: report
+    volumes:
+      - postgres-report-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U report -d report_db']
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - familieoya
+
+  audit-service:
+    build:
+      context: .
+      dockerfile: apps/audit-service/Dockerfile
+    ports:
+      - '3007:3007'
+    environment:
+      PORT: 3007
+      NODE_ENV: development
+      DATABASE_URL: postgres://audit:audit@postgres-audit:5432/audit_db
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      INTERNAL_SECRET: ${INTERNAL_SECRET}
+    depends_on:
+      postgres-audit:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:3007/health']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - familieoya
+
+  postgres-audit:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: audit_db
+      POSTGRES_USER: audit
+      POSTGRES_PASSWORD: audit
+    volumes:
+      - postgres-audit-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U audit -d audit_db']
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - familieoya
+
+  mfe-reports:
+    build:
+      context: .
+      dockerfile: apps/mfe-reports/Dockerfile
+    ports:
+      - '4205:80'
+    networks:
+      - familieoya
+
+  mfe-settings:
+    build:
+      context: .
+      dockerfile: apps/mfe-settings/Dockerfile
+    ports:
+      - '4206:80'
+    networks:
+      - familieoya
+
 volumes:
   postgres-auth-data:
   postgres-household-data:
   postgres-transaction-data:
   postgres-budget-data:
   postgres-notification-data:
+  postgres-report-data:
+  postgres-audit-data:
 
 networks:
   familieoya:

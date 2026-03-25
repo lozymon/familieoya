@@ -1,0 +1,27 @@
+{
+  "name": "mfe-reports",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/mfe-reports/src",
+  "projectType": "application",
+  "targets": {
+    "serve": {
+      "executor": "@nx/vite:dev-server",
+      "options": {
+        "buildTarget": "mfe-reports:vite-build",
+        "port": 4205
+      }
+    },
+    "vite-build": {
+      "executor": "@nx/vite:build",
+      "options": {
+        "configFile": "apps/mfe-reports/vite.config.ts"
+      },
+      "configurations": {
+        "production": {
+          "mode": "production"
+        }
+      }
+    }
+  },
+  "tags": ["type:app", "scope:mfe"]
+}

@@ -8,6 +8,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { ClientProxy } from '@nestjs/microservices';
+import { HttpService } from '@nestjs/axios';
+import { ConfigService } from '@nestjs/config';
+import { firstValueFrom } from 'rxjs';
 import * as bcrypt from 'bcrypt';
 import { User } from '../users/user.entity';
 import { RefreshToken } from '../users/refresh-token.entity';
@@ -15,7 +18,11 @@ import {
   RegisterDto,
   LoginDto,
   USER_REGISTERED,
+  USER_DELETED,
+  USER_DATA_EXPORTED,
   UserRegisteredEvent,
+  UserDeletedEvent,
+  UserDataExportedEvent,
 } from '@familieoya/contracts';
 
 const BCRYPT_ROUNDS = 10;
@@ -31,6 +38,8 @@ export class AuthService {
     private readonly jwt: JwtService,
     @Inject('RABBITMQ_CLIENT')
     private readonly rmq: ClientProxy,
+    private readonly http: HttpService,
+    private readonly config: ConfigService,
   ) {}
 
   async register(dto: RegisterDto): Promise<{ userId: string; email: string }> {
@@ -138,6 +147,77 @@ export class AuthService {
       householdUpdates: user.householdUpdates,
       weeklyDigest: user.weeklyDigest,
     };
+  }
+
+  async updateProfile(
+    userId: string,
+    body: {
+      name?: string;
+      email?: string;
+      preferredLanguage?: 'en' | 'no' | 'pt';
+    },
+  ): Promise<Omit<User, 'passwordHash'>> {
+    const user = await this.users.findOneOrFail({ where: { id: userId } });
+    if (body.name !== undefined) user.name = body.name;
+    if (body.email !== undefined) user.email = body.email;
+    if (body.preferredLanguage !== undefined)
+      user.preferredLanguage = body.preferredLanguage;
+    await this.users.save(user);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { passwordHash: _, ...profile } = user;
+    return profile;
+  }
+
+  async deleteUser(userId: string): Promise<void> {
+    await this.users.delete({ id: userId });
+    await this.refreshTokens.delete({ userId });
+
+    const event: UserDeletedEvent = {
+      eventId: crypto.randomUUID(),
+      userId,
+    };
+    this.rmq.emit<void, UserDeletedEvent>(USER_DELETED, event);
+  }
+
+  async exportUserData(userId: string): Promise<Record<string, unknown>> {
+    const internalSecret = this.config.getOrThrow<string>('INTERNAL_SECRET');
+    const headers = { 'x-internal-secret': internalSecret };
+
+    const user = await this.users.findOneOrFail({ where: { id: userId } });
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { passwordHash: _, ...profile } = user;
+
+    const serviceUrls: Record<string, string> = {
+      transactions: this.config.get<string>('TRANSACTION_SERVICE_URL', ''),
+      households: this.config.get<string>('HOUSEHOLD_SERVICE_URL', ''),
+      notifications: this.config.get<string>('NOTIFICATION_SERVICE_URL', ''),
+      audit: this.config.get<string>('AUDIT_SERVICE_URL', ''),
+      reports: this.config.get<string>('REPORT_SERVICE_URL', ''),
+    };
+
+    const results: Record<string, unknown> = { profile };
+
+    for (const [key, baseUrl] of Object.entries(serviceUrls)) {
+      if (!baseUrl) continue;
+      try {
+        const { data } = await firstValueFrom(
+          this.http.get<unknown>(`${baseUrl}/internal/users/${userId}/export`, {
+            headers,
+          }),
+        );
+        results[key] = data;
+      } catch {
+        results[key] = null;
+      }
+    }
+
+    const event: UserDataExportedEvent = {
+      eventId: crypto.randomUUID(),
+      userId,
+    };
+    this.rmq.emit<void, UserDataExportedEvent>(USER_DATA_EXPORTED, event);
+
+    return results;
   }
 
   private async issueTokens(

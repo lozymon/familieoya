@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Delete,
+  Get,
+  Patch,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { ThrottlerGuard, Throttle } from '@nestjs/throttler';
 import { Request, Response } from 'express';
 import { ProxyService } from '../proxy/proxy.service';
@@ -36,6 +45,65 @@ export class AuthController {
   @Get('me')
   @UseGuards(JwtAuthGuard)
   me(@Req() req: Request, @Res() res: Response) {
+    return this.proxy.forward(req, res, 'AUTH_SERVICE_URL');
+  }
+
+  @Patch('me')
+  @UseGuards(JwtAuthGuard)
+  updateMe(@Req() req: Request, @Res() res: Response) {
+    return this.proxy.forward(req, res, 'AUTH_SERVICE_URL');
+  }
+
+  @Delete('me')
+  @UseGuards(JwtAuthGuard)
+  deleteMe(@Req() req: Request, @Res() res: Response) {
+    return this.proxy.forward(req, res, 'AUTH_SERVICE_URL');
+  }
+
+  @Get('me/data-export')
+  @UseGuards(JwtAuthGuard)
+  dataExport(@Req() req: Request, @Res() res: Response) {
+    return this.proxy.forward(req, res, 'AUTH_SERVICE_URL');
+  }
+
+  @Get('me/notification-preferences')
+  @UseGuards(JwtAuthGuard)
+  getNotificationPreferences(@Req() req: Request, @Res() res: Response) {
+    return this.proxy.forward(req, res, 'AUTH_SERVICE_URL');
+  }
+
+  @Patch('me/notification-preferences')
+  @UseGuards(JwtAuthGuard)
+  updateNotificationPreferences(@Req() req: Request, @Res() res: Response) {
+    return this.proxy.forward(req, res, 'AUTH_SERVICE_URL');
+  }
+
+  @Post('2fa/enable')
+  @UseGuards(JwtAuthGuard)
+  twoFaEnable(@Req() req: Request, @Res() res: Response) {
+    return this.proxy.forward(req, res, 'AUTH_SERVICE_URL');
+  }
+
+  @Post('2fa/verify')
+  @UseGuards(JwtAuthGuard)
+  twoFaVerify(@Req() req: Request, @Res() res: Response) {
+    return this.proxy.forward(req, res, 'AUTH_SERVICE_URL');
+  }
+
+  @Get('2fa/recovery-status')
+  @UseGuards(JwtAuthGuard)
+  twoFaRecoveryStatus(@Req() req: Request, @Res() res: Response) {
+    return this.proxy.forward(req, res, 'AUTH_SERVICE_URL');
+  }
+
+  @Post('2fa/regenerate')
+  @UseGuards(JwtAuthGuard)
+  twoFaRegenerate(@Req() req: Request, @Res() res: Response) {
+    return this.proxy.forward(req, res, 'AUTH_SERVICE_URL');
+  }
+
+  @Post('login/recover')
+  loginRecover(@Req() req: Request, @Res() res: Response) {
     return this.proxy.forward(req, res, 'AUTH_SERVICE_URL');
   }
 }

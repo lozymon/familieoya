@@ -1,0 +1,27 @@
+{
+  "name": "mfe-settings",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/mfe-settings/src",
+  "projectType": "application",
+  "targets": {
+    "serve": {
+      "executor": "@nx/vite:dev-server",
+      "options": {
+        "buildTarget": "mfe-settings:vite-build",
+        "port": 4206
+      }
+    },
+    "vite-build": {
+      "executor": "@nx/vite:build",
+      "options": {
+        "configFile": "apps/mfe-settings/vite.config.ts"
+      },
+      "configurations": {
+        "production": {
+          "mode": "production"
+        }
+      }
+    }
+  },
+  "tags": ["type:app", "scope:mfe"]
+}

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   Param,
@@ -80,6 +81,33 @@ export class AuthController {
   getProfile(@Req() req: Request) {
     const userId = req.headers['x-user-id'] as string;
     return this.authService.getProfile(userId);
+  }
+
+  @Patch('me')
+  updateMe(
+    @Req() req: Request,
+    @Body()
+    body: {
+      name?: string;
+      email?: string;
+      preferredLanguage?: 'en' | 'no' | 'pt';
+    },
+  ) {
+    const userId = req.headers['x-user-id'] as string;
+    return this.authService.updateProfile(userId, body);
+  }
+
+  @Delete('me')
+  @HttpCode(204)
+  async deleteMe(@Req() req: Request) {
+    const userId = req.headers['x-user-id'] as string;
+    await this.authService.deleteUser(userId);
+  }
+
+  @Get('me/data-export')
+  dataExport(@Req() req: Request) {
+    const userId = req.headers['x-user-id'] as string;
+    return this.authService.exportUserData(userId);
   }
 
   @Get('me/notification-preferences')

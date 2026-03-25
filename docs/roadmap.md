@@ -224,22 +224,22 @@ _Goal: Complete the full feature set_
 
 **Backend:**
 
-- [ ] Scaffold `report-service` — consumes `transaction.*` events, maintains aggregated read model
-- [ ] Implement monthly, yearly, member report endpoints
-- [ ] Implement CSV export + `export_history` table
-- [ ] Scaffold `audit-service` — consumes all write events, stores to `activity_logs`
-- [ ] Add `GET /audit/activity` endpoint
-- [ ] Add `GET /auth/me/data-export` (GDPR JSON export) to auth-service
+- [x] Scaffold `report-service` — consumes `transaction.*` events, maintains aggregated read model
+- [x] Implement monthly, yearly, member report endpoints
+- [x] Implement CSV export + `export_history` table
+- [x] Scaffold `audit-service` — consumes all write events, stores to `activity_logs`
+- [x] Add `GET /audit/activity` endpoint
+- [x] Add `GET /auth/me/data-export` (GDPR JSON export) to auth-service
 
 **Frontend:**
 
-- [ ] Reports MFE: index, monthly report + chart, yearly report + chart, per-member report
-- [ ] Reports MFE: CSV export button + export history list
-- [ ] Settings MFE: profile, password, 2FA pages (move out of auth MFE)
-- [ ] Settings MFE: appearance page (dark/light/system toggle via Tailwind + localStorage)
-- [ ] Settings MFE: activity log page (feed from audit-service)
-- [ ] Settings MFE: export history page
-- [ ] Settings MFE: privacy page (GDPR data export download + delete account with confirmation)
+- [x] Reports MFE: index, monthly report + chart, yearly report + chart, per-member report
+- [x] Reports MFE: CSV export button + export history list
+- [x] Settings MFE: profile, password, 2FA pages (move out of auth MFE)
+- [x] Settings MFE: appearance page (dark/light/system toggle via Tailwind + localStorage)
+- [x] Settings MFE: activity log page (feed from audit-service)
+- [x] Settings MFE: export history page
+- [x] Settings MFE: privacy page (GDPR data export download + delete account with confirmation)
 
 **Milestone:** Full feature set complete — reports, settings, audit, and GDPR all working
 
