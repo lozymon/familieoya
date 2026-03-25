@@ -65,6 +65,8 @@ jobs:
           NODE_ENV: test
           DATABASE_URL: postgres://test:test@localhost:5433/auth_test
           HOUSEHOLD_DATABASE_URL: postgres://test:test@localhost:5434/household_test
+          TRANSACTION_DATABASE_URL: postgres://test:test@localhost:5435/transaction_test
+          BUDGET_DATABASE_URL: postgres://test:test@localhost:5436/budget_test
           RABBITMQ_URL: amqp://localhost:5673
           INTERNAL_SECRET: ci-internal-secret
 
