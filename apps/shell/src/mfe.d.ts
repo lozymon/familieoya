@@ -23,6 +23,16 @@ declare module 'mfe-transaction/TransactionListPage' {
   export default TransactionListPage;
 }
 
+declare module 'mfe-transaction/TransactionFormPage' {
+  const TransactionFormPage: React.ComponentType;
+  export default TransactionFormPage;
+}
+
+declare module 'mfe-transaction/CategoriesPage' {
+  const CategoriesPage: React.ComponentType;
+  export default CategoriesPage;
+}
+
 declare module 'mfe-budget/BudgetPage' {
   const BudgetPage: React.ComponentType;
   export default BudgetPage;
@@ -31,4 +41,9 @@ declare module 'mfe-budget/BudgetPage' {
 declare module 'mfe-household/HouseholdPage' {
   const HouseholdPage: React.ComponentType;
   export default HouseholdPage;
+}
+
+declare module 'mfe-household/InvitationPage' {
+  const InvitationPage: React.ComponentType;
+  export default InvitationPage;
 }

@@ -5,9 +5,11 @@ export interface AuthContextValue {
   accessToken: string | null;
   user: UserProfile | null;
   isLoading: boolean;
+  activeHouseholdId: string | null;
   login: (dto: LoginDto) => Promise<void>;
   logout: () => Promise<void>;
   setAccessToken: (token: string | null) => void;
+  setActiveHouseholdId: (id: string | null) => void;
 }
 
 // Module Federation bundles each lib separately, so createContext() would run

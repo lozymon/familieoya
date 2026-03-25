@@ -7,6 +7,7 @@ import React, {
 } from 'react';
 import {
   setTokenAccessors,
+  setHouseholdIdAccessor,
   login as apiLogin,
   logout as apiLogout,
   getMe,
@@ -19,12 +20,26 @@ import {
 import type { Socket } from 'socket.io-client';
 import { useQueryClient } from '@tanstack/react-query';
 
+const HOUSEHOLD_STORAGE_KEY = 'familieoya_active_household';
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [user, setUser] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeHouseholdId, setActiveHouseholdIdState] = useState<
+    string | null
+  >(() => localStorage.getItem(HOUSEHOLD_STORAGE_KEY));
   const socketRef = useRef<Socket | null>(null);
   const queryClient = useQueryClient();
+
+  const setActiveHouseholdId = useCallback((id: string | null) => {
+    setActiveHouseholdIdState(id);
+    if (id) {
+      localStorage.setItem(HOUSEHOLD_STORAGE_KEY, id);
+    } else {
+      localStorage.removeItem(HOUSEHOLD_STORAGE_KEY);
+    }
+  }, []);
 
   // Wire token accessors into the axios interceptor
   useEffect(() => {
@@ -33,6 +48,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       (token) => setAccessToken(token),
     );
   }, [accessToken]);
+
+  // Wire household ID accessor into the axios interceptor
+  useEffect(() => {
+    setHouseholdIdAccessor(() => activeHouseholdId);
+  }, [activeHouseholdId]);
 
   // Attempt a silent refresh on mount to restore session
   useEffect(() => {
@@ -87,7 +107,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ accessToken, user, isLoading, login, logout, setAccessToken }}
+      value={{
+        accessToken,
+        user,
+        isLoading,
+        activeHouseholdId,
+        login,
+        logout,
+        setAccessToken,
+        setActiveHouseholdId,
+      }}
     >
       {children}
     </AuthContext.Provider>

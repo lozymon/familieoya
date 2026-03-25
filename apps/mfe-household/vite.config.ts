@@ -10,6 +10,7 @@ export default defineConfig({
       filename: 'remoteEntry.js',
       exposes: {
         './HouseholdPage': './src/pages/HouseholdPage',
+        './InvitationPage': './src/pages/InvitationPage',
       },
       shared: {
         react: { singleton: true, requiredVersion: '^19.0.0' } as never,

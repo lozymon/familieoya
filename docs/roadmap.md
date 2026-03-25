@@ -207,12 +207,12 @@ _Goal: Working frontend skeleton with login flow_
 
 _Goal: Core data entry usable in the browser_
 
-- [ ] Wire `libs/api-client` for transaction + household endpoints
-- [ ] Transaction MFE: transaction list page (filterable table), add/edit form, bulk delete
-- [ ] Transaction MFE: dashboard page — monthly summary cards + spending by category chart (Recharts)
-- [ ] Transaction MFE: category management page
-- [ ] Household MFE: household overview, member list, invite flow, role management
-- [ ] Connect shell notification bell to `GET /notifications`
+- [x] Wire `libs/api-client` for transaction + household endpoints
+- [x] Transaction MFE: transaction list page (filterable table), add/edit form, bulk delete
+- [x] Transaction MFE: dashboard page — monthly summary cards + spending by category chart (Recharts)
+- [x] Transaction MFE: category management page
+- [x] Household MFE: household overview, member list, invite flow, role management
+- [x] Connect shell notification bell to `GET /notifications`
 
 **Milestone:** Full transaction CRUD and household management working in browser
 

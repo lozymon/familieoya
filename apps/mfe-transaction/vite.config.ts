@@ -11,6 +11,8 @@ export default defineConfig({
       exposes: {
         './DashboardPage': './src/pages/DashboardPage',
         './TransactionListPage': './src/pages/TransactionListPage',
+        './TransactionFormPage': './src/pages/TransactionFormPage',
+        './CategoriesPage': './src/pages/CategoriesPage',
       },
       shared: {
         react: { singleton: true, requiredVersion: '^19.0.0' } as never,

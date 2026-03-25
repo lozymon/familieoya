@@ -1,10 +1,11 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, CreditCard, Target, Home } from 'lucide-react';
+import { LayoutDashboard, CreditCard, Target, Home, Tag } from 'lucide-react';
 import { cn } from '@familieoya/ui';
 
 const navItems = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/transactions', label: 'Transactions', icon: CreditCard },
+  { to: '/categories', label: 'Categories', icon: Tag },
   { to: '/budgets', label: 'Budgets', icon: Target },
   { to: '/households', label: 'Household', icon: Home },
 ];

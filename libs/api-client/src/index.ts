@@ -1,7 +1,10 @@
-export { apiClient, setTokenAccessors } from './client';
+export { apiClient, setTokenAccessors, setHouseholdIdAccessor } from './client';
 export * from './types';
 export * from './auth';
 export * from './notifications';
+export * from './transactions';
+export * from './categories';
+export * from './households';
 export { connectNotificationSocket } from './notifications.ws';
 export { AuthContext } from './auth-context';
 export type { AuthContextValue } from './auth-context';

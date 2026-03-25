@@ -2,6 +2,7 @@ import axios, { type AxiosInstance } from 'axios';
 
 let tokenGetter: (() => string | null) | null = null;
 let tokenSetter: ((token: string | null) => void) | null = null;
+let householdIdGetter: (() => string | null) | null = null;
 
 export function setTokenAccessors(
   getter: () => string | null,
@@ -9,6 +10,10 @@ export function setTokenAccessors(
 ) {
   tokenGetter = getter;
   tokenSetter = setter;
+}
+
+export function setHouseholdIdAccessor(getter: () => string | null) {
+  householdIdGetter = getter;
 }
 
 export const apiClient: AxiosInstance = axios.create({
@@ -24,6 +29,10 @@ apiClient.interceptors.request.use((config) => {
   const token = tokenGetter?.();
   if (token) {
     config.headers['Authorization'] = `Bearer ${token}`;
+  }
+  const householdId = householdIdGetter?.();
+  if (householdId) {
+    config.headers['X-Household-ID'] = householdId;
   }
   return config;
 });
