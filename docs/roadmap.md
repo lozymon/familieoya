@@ -66,16 +66,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0          # required for nx affected
+          fetch-depth: 0 # required for nx affected
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
 
       - run: npm ci
 
-      - uses: nrwl/nx-set-shas@v4  # sets NX_BASE + NX_HEAD for affected
+      - uses: nrwl/nx-set-shas@v4 # sets NX_BASE + NX_HEAD for affected
 
       - run: npx nx affected --target=lint --parallel=3
       - run: npx nx affected --target=test --parallel=3
@@ -91,7 +91,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
 
       - run: npm ci
@@ -114,14 +114,14 @@ jobs:
 
 _Goal: Users can create and join households_
 
-- [ ] Scaffold `household-service` with PostgreSQL
-- [ ] Implement household CRUD
-- [ ] Implement member management + role system (admin/member)
-- [ ] Implement invitation flow (token-based, email-tied, one-time use `usedAt`)
-- [ ] Publish `household.created` + `household.invitation.sent` + `household.member.joined` + `household.deleted` events
-- [ ] `POST /invitations/:token/accept` returns `{ householdId, householdName }` — client uses this to update active household context
-- [ ] Scaffold `notification-service` (consume invitation event → log to console for now)
-- [ ] Integration tests for full invitation flow
+- [x] Scaffold `household-service` with PostgreSQL
+- [x] Implement household CRUD
+- [x] Implement member management + role system (admin/member)
+- [x] Implement invitation flow (token-based, email-tied, one-time use `usedAt`)
+- [x] Publish `household.created` + `household.invitation.sent` + `household.member.joined` + `household.deleted` events
+- [x] `POST /invitations/:token/accept` returns `{ householdId, householdName }` — client uses this to update active household context
+- [x] Scaffold `notification-service` (consume invitation event → log to console for now)
+- [x] Integration tests for full invitation flow
 
 **Milestone:** User A invites user B → B accepts → both are in the household
 
