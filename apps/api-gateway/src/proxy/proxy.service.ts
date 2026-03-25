@@ -6,7 +6,7 @@ import { firstValueFrom } from 'rxjs';
 import type { Method } from 'axios';
 
 interface RequestWithUser extends Request {
-  user?: { sub: string };
+  user?: { sub: string; email: string };
   householdId?: string;
 }
 
@@ -32,6 +32,7 @@ export class ProxyService {
 
     // Inject trust headers — downstream services are on the internal network only
     if (req.user?.sub) headers['x-user-id'] = req.user.sub;
+    if (req.user?.email) headers['x-user-email'] = req.user.email;
     if (req.householdId) headers['x-household-id'] = req.householdId;
     // Remove auth header — downstream services use x-user-id instead
     delete headers['authorization'];

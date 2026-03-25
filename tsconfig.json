@@ -23,6 +23,12 @@
     },
     {
       "path": "./apps/api-gateway"
+    },
+    {
+      "path": "./apps/notification-service"
+    },
+    {
+      "path": "./apps/household-service"
     }
   ]
 }
