@@ -30,7 +30,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     string | null
   >(() => localStorage.getItem(HOUSEHOLD_STORAGE_KEY));
   const socketRef = useRef<Socket | null>(null);
+  // Ref keeps the latest token synchronously available for the axios interceptor
+  // without waiting for a React re-render + effect cycle.
+  const tokenRef = useRef<string | null>(null);
   const queryClient = useQueryClient();
+
+  // Wire accessors once — getter reads the ref, setter updates both ref and state.
+  useEffect(() => {
+    setTokenAccessors(
+      () => tokenRef.current,
+      (token) => {
+        tokenRef.current = token;
+        setAccessToken(token);
+      },
+    );
+  }, []);
 
   const setActiveHouseholdId = useCallback((id: string | null) => {
     setActiveHouseholdIdState(id);
@@ -40,14 +54,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.removeItem(HOUSEHOLD_STORAGE_KEY);
     }
   }, []);
-
-  // Wire token accessors into the axios interceptor
-  useEffect(() => {
-    setTokenAccessors(
-      () => accessToken,
-      (token) => setAccessToken(token),
-    );
-  }, [accessToken]);
 
   // Wire household ID accessor into the axios interceptor
   useEffect(() => {
@@ -61,6 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const { data } = await import('@familieoya/api-client').then((m) =>
           m.apiClient.post<{ accessToken: string }>('/auth/refresh'),
         );
+        tokenRef.current = data.accessToken;
         setAccessToken(data.accessToken);
         const profile = await getMe();
         setUser(profile);
@@ -90,6 +97,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = useCallback(async (dto: LoginDto) => {
     const { accessToken: token } = await apiLogin(dto);
+    tokenRef.current = token;
     setAccessToken(token);
     const profile = await getMe();
     setUser(profile);
