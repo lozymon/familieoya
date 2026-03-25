@@ -131,12 +131,12 @@ _Goal: Users can create and join households_
 
 _Goal: Core financial data entry working_
 
-- [ ] Scaffold `transaction-service` with PostgreSQL
-- [ ] Implement category CRUD — seeded with **keyed** categories (`food`, `electricity`, `housing`, etc.) not Norwegian strings. `key` field is null for user-created categories. See edge-cases.md for full seed table.
-- [ ] Implement transaction CRUD + bulk delete
-- [ ] Implement `/summary` endpoint (totals by category/month)
-- [ ] Publish `transaction.created/updated/deleted` events
-- [ ] Integration tests covering CRUD + event emission
+- [x] Scaffold `transaction-service` with PostgreSQL
+- [x] Implement category CRUD — seeded with **keyed** categories (`food`, `electricity`, `housing`, etc.) not Norwegian strings. `key` field is null for user-created categories. See edge-cases.md for full seed table.
+- [x] Implement transaction CRUD + bulk delete
+- [x] Implement `/summary` endpoint (totals by category/month)
+- [x] Publish `transaction.created/updated/deleted` events
+- [x] Integration tests covering CRUD + event emission
 
 **Milestone:** Can add income/expense transactions; summary endpoint returns correct totals
 
