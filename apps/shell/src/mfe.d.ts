@@ -47,3 +47,28 @@ declare module 'mfe-household/InvitationPage' {
   const InvitationPage: React.ComponentType;
   export default InvitationPage;
 }
+
+declare module 'mfe-reports/MonthlyReportPage' {
+  const MonthlyReportPage: React.ComponentType;
+  export default MonthlyReportPage;
+}
+
+declare module 'mfe-reports/YearlyReportPage' {
+  const YearlyReportPage: React.ComponentType;
+  export default YearlyReportPage;
+}
+
+declare module 'mfe-reports/MemberReportPage' {
+  const MemberReportPage: React.ComponentType;
+  export default MemberReportPage;
+}
+
+declare module 'mfe-reports/ExportHistoryPage' {
+  const ExportHistoryPage: React.ComponentType;
+  export default ExportHistoryPage;
+}
+
+declare module 'mfe-settings/SettingsPage' {
+  const SettingsPage: React.ComponentType;
+  export default SettingsPage;
+}

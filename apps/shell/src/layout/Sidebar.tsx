@@ -1,5 +1,13 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, CreditCard, Target, Home, Tag } from 'lucide-react';
+import {
+  LayoutDashboard,
+  CreditCard,
+  Target,
+  Home,
+  Tag,
+  BarChart2,
+  Settings,
+} from 'lucide-react';
 import { cn } from '@familieoya/ui';
 
 const navItems = [
@@ -8,6 +16,8 @@ const navItems = [
   { to: '/categories', label: 'Categories', icon: Tag },
   { to: '/budgets', label: 'Budgets', icon: Target },
   { to: '/households', label: 'Household', icon: Home },
+  { to: '/reports/monthly', label: 'Reports', icon: BarChart2 },
+  { to: '/settings', label: 'Settings', icon: Settings },
 ];
 
 export function Sidebar() {

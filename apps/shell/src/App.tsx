@@ -19,6 +19,11 @@ const CategoriesPage = lazy(() => import('mfe-transaction/CategoriesPage'));
 const BudgetPage = lazy(() => import('mfe-budget/BudgetPage'));
 const HouseholdPage = lazy(() => import('mfe-household/HouseholdPage'));
 const InvitationPage = lazy(() => import('mfe-household/InvitationPage'));
+const MonthlyReportPage = lazy(() => import('mfe-reports/MonthlyReportPage'));
+const YearlyReportPage = lazy(() => import('mfe-reports/YearlyReportPage'));
+const MemberReportPage = lazy(() => import('mfe-reports/MemberReportPage'));
+const ExportHistoryPage = lazy(() => import('mfe-reports/ExportHistoryPage'));
+const SettingsPage = lazy(() => import('mfe-settings/SettingsPage'));
 
 function LoadingFallback() {
   return (
@@ -63,6 +68,11 @@ function AppRoutes() {
           <Route path="/households" element={<HouseholdPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/reports/monthly" element={<MonthlyReportPage />} />
+          <Route path="/reports/yearly" element={<YearlyReportPage />} />
+          <Route path="/reports/members" element={<MemberReportPage />} />
+          <Route path="/reports/exports" element={<ExportHistoryPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
         </Route>
       </Routes>
     </Suspense>

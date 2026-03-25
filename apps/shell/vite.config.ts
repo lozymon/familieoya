@@ -20,6 +20,8 @@ export default defineConfig(async ({ mode }) => {
           'mfe-transaction': `${proxyBase}/remotes/transaction/assets/remoteEntry.js`,
           'mfe-household': `${proxyBase}/remotes/household/assets/remoteEntry.js`,
           'mfe-budget': `${proxyBase}/remotes/budget/assets/remoteEntry.js`,
+          'mfe-reports': `${proxyBase}/remotes/reports/assets/remoteEntry.js`,
+          'mfe-settings': `${proxyBase}/remotes/settings/assets/remoteEntry.js`,
         },
         shared: {
           react: { singleton: true, requiredVersion: '^19.0.0' },

@@ -68,6 +68,8 @@ jobs:
           TRANSACTION_DATABASE_URL: postgres://test:test@localhost:5435/transaction_test
           BUDGET_DATABASE_URL: postgres://test:test@localhost:5436/budget_test
           NOTIFICATION_DATABASE_URL: postgres://test:test@localhost:5437/notification_test
+          REPORT_DATABASE_URL: postgres://test:test@localhost:5438/report_test
+          AUDIT_DATABASE_URL: postgres://test:test@localhost:5439/audit_test
           RABBITMQ_URL: amqp://localhost:5673
           INTERNAL_SECRET: ci-internal-secret
 
