@@ -43,19 +43,10 @@
       "path": "./libs/api-client"
     },
     {
-      "path": "./apps/shell"
+      "path": "./apps/report-service"
     },
     {
-      "path": "./apps/mfe-auth"
-    },
-    {
-      "path": "./apps/mfe-transaction"
-    },
-    {
-      "path": "./apps/mfe-household"
-    },
-    {
-      "path": "./apps/mfe-budget"
+      "path": "./apps/audit-service"
     }
   ]
 }

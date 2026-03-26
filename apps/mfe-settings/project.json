@@ -4,21 +4,15 @@
   "sourceRoot": "apps/mfe-settings/src",
   "projectType": "application",
   "targets": {
-    "serve": {
-      "executor": "@nx/vite:dev-server",
-      "options": {
-        "buildTarget": "mfe-settings:vite-build",
-        "port": 4206
-      }
-    },
     "vite-build": {
-      "executor": "@nx/vite:build",
+      "executor": "nx:run-commands",
       "options": {
-        "configFile": "apps/mfe-settings/vite.config.ts"
+        "command": "npx vite build",
+        "cwd": "apps/mfe-settings"
       },
       "configurations": {
         "production": {
-          "mode": "production"
+          "command": "npx vite build --mode production"
         }
       }
     }
