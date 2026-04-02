@@ -166,12 +166,13 @@ export default function HouseholdPage() {
   );
   const isAdmin = currentMember?.role === 'admin';
 
-  // No household — offer to create one
   if (!householdId) {
     return (
       <div className="flex flex-col gap-6">
-        <h1 className="text-2xl font-semibold">Household</h1>
-        <p className="text-slate-500">
+        <h1 className="text-2xl font-semibold dark:text-slate-100">
+          Household
+        </h1>
+        <p className="text-slate-500 dark:text-slate-400">
           You don&apos;t have a household yet. Create one below, or accept an
           invitation link from a household admin.
         </p>
@@ -185,8 +186,10 @@ export default function HouseholdPage() {
   if (isLoading) {
     return (
       <div className="flex flex-col gap-4">
-        <h1 className="text-2xl font-semibold">Household</h1>
-        <p className="text-slate-500">Loading…</p>
+        <h1 className="text-2xl font-semibold dark:text-slate-100">
+          Household
+        </h1>
+        <p className="text-slate-500 dark:text-slate-400">Loading…</p>
       </div>
     );
   }
@@ -196,32 +199,37 @@ export default function HouseholdPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-semibold">{household.name}</h1>
-        <p className="text-sm text-slate-500">
+        <h1 className="text-2xl font-semibold dark:text-slate-100">
+          {household.name}
+        </h1>
+        <p className="text-sm text-slate-500 dark:text-slate-400">
           Currency: {household.currency} · {household.members.length}{' '}
           {household.members.length === 1 ? 'member' : 'members'}
         </p>
       </div>
 
-      {/* Members list */}
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Members</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          <ul className="divide-y divide-slate-100">
+          <ul className="divide-y divide-slate-100 dark:divide-slate-700">
             {household.members.map((m: HouseholdMember) => (
               <li key={m.userId} className="flex items-center gap-3 px-4 py-3">
                 <div className="flex-1 min-w-0">
-                  <p className="truncate text-sm font-medium">{m.name}</p>
-                  <p className="truncate text-xs text-slate-500">{m.email}</p>
+                  <p className="truncate text-sm font-medium dark:text-slate-200">
+                    {m.name}
+                  </p>
+                  <p className="truncate text-xs text-slate-500 dark:text-slate-400">
+                    {m.email}
+                  </p>
                 </div>
 
                 <Badge
                   className={
                     m.role === 'admin'
-                      ? 'bg-amber-100 text-amber-700 hover:bg-amber-100'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-100'
+                      ? 'bg-amber-100 text-amber-700 hover:bg-amber-100 dark:bg-amber-900/40 dark:text-amber-400 dark:hover:bg-amber-900/40'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-100 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-700'
                   }
                 >
                   {m.role === 'admin' && (
@@ -248,7 +256,7 @@ export default function HouseholdPage() {
                     <Button
                       size="icon"
                       variant="ghost"
-                      className="h-7 w-7 text-red-500 hover:text-red-600"
+                      className="h-7 w-7 text-red-500 hover:text-red-600 dark:text-red-400"
                       onClick={() => removeUser(m.userId)}
                     >
                       <Trash2 className="h-3.5 w-3.5" />
@@ -261,7 +269,6 @@ export default function HouseholdPage() {
         </CardContent>
       </Card>
 
-      {/* Invite form (admins only) */}
       {isAdmin && (
         <Card className="max-w-md">
           <CardHeader>
@@ -295,7 +302,9 @@ export default function HouseholdPage() {
                   </p>
                 )}
                 {inviteSuccess && (
-                  <p className="text-sm text-emerald-600">Invitation sent!</p>
+                  <p className="text-sm text-emerald-600 dark:text-emerald-400">
+                    Invitation sent!
+                  </p>
                 )}
               </div>
               <Separator />

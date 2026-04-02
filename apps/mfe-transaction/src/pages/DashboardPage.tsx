@@ -31,7 +31,7 @@ function formatCurrency(amountOre: number, currency = 'NOK'): string {
 }
 
 function currentMonth(): string {
-  return new Date().toISOString().slice(0, 7); // YYYY-MM
+  return new Date().toISOString().slice(0, 7);
 }
 
 export default function DashboardPage() {
@@ -63,7 +63,7 @@ export default function DashboardPage() {
     .sort((a, b) => b.amount - a.amount);
 
   const COLORS = [
-    '#3b82f6',
+    '#6366f1',
     '#10b981',
     '#f59e0b',
     '#ef4444',
@@ -76,12 +76,17 @@ export default function DashboardPage() {
   if (!householdId) {
     return (
       <div className="flex flex-col gap-4">
-        <h1 className="text-2xl font-semibold">Dashboard</h1>
+        <h1 className="text-2xl font-semibold dark:text-slate-100">
+          Dashboard
+        </h1>
         <Card>
           <CardContent className="pt-6">
-            <p className="text-slate-500">
+            <p className="text-slate-500 dark:text-slate-400">
               No household selected. Go to{' '}
-              <Link to="/households" className="underline text-slate-900">
+              <Link
+                to="/households"
+                className="underline text-indigo-600 dark:text-indigo-400"
+              >
                 Households
               </Link>{' '}
               to create or join one.
@@ -101,8 +106,12 @@ export default function DashboardPage() {
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">Dashboard</h1>
-          <p className="text-sm text-slate-500">{monthLabel}</p>
+          <h1 className="text-2xl font-semibold dark:text-slate-100">
+            Dashboard
+          </h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            {monthLabel}
+          </p>
         </div>
         <Button asChild>
           <Link to="/transactions/new">
@@ -116,13 +125,13 @@ export default function DashboardPage() {
       <div className="grid gap-4 sm:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-slate-500">
+            <CardTitle className="text-sm font-medium text-slate-500 dark:text-slate-400">
               Income
             </CardTitle>
             <TrendingUp className="h-4 w-4 text-emerald-500" />
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold text-emerald-600">
+            <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
               {isLoading ? '—' : formatCurrency(totalIncome)}
             </p>
           </CardContent>
@@ -130,13 +139,13 @@ export default function DashboardPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-slate-500">
+            <CardTitle className="text-sm font-medium text-slate-500 dark:text-slate-400">
               Expenses
             </CardTitle>
             <TrendingDown className="h-4 w-4 text-red-500" />
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold text-red-600">
+            <p className="text-2xl font-bold text-red-600 dark:text-red-400">
               {isLoading ? '—' : formatCurrency(totalExpense)}
             </p>
           </CardContent>
@@ -144,14 +153,14 @@ export default function DashboardPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-slate-500">
+            <CardTitle className="text-sm font-medium text-slate-500 dark:text-slate-400">
               Net
             </CardTitle>
-            <Wallet className="h-4 w-4 text-slate-500" />
+            <Wallet className="h-4 w-4 text-slate-500 dark:text-slate-400" />
           </CardHeader>
           <CardContent>
             <p
-              className={`text-2xl font-bold ${net >= 0 ? 'text-emerald-600' : 'text-red-600'}`}
+              className={`text-2xl font-bold ${net >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}
             >
               {isLoading ? '—' : formatCurrency(net)}
             </p>
@@ -163,7 +172,9 @@ export default function DashboardPage() {
       {!isLoading && expenseByCategory.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Spending by category</CardTitle>
+            <CardTitle className="dark:text-slate-100">
+              Spending by category
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={280}>
@@ -171,15 +182,19 @@ export default function DashboardPage() {
                 data={expenseByCategory}
                 margin={{ top: 4, right: 8, left: 8, bottom: 40 }}
               >
-                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  vertical={false}
+                  stroke="var(--chart-grid, #e2e8f0)"
+                />
                 <XAxis
                   dataKey="name"
-                  tick={{ fontSize: 12 }}
+                  tick={{ fontSize: 12, fill: 'var(--chart-text, #64748b)' }}
                   angle={-35}
                   textAnchor="end"
                 />
                 <YAxis
-                  tick={{ fontSize: 12 }}
+                  tick={{ fontSize: 12, fill: 'var(--chart-text, #64748b)' }}
                   tickFormatter={(v: number) =>
                     new Intl.NumberFormat('nb-NO', {
                       notation: 'compact',
@@ -187,6 +202,12 @@ export default function DashboardPage() {
                   }
                 />
                 <Tooltip
+                  contentStyle={{
+                    background: 'var(--chart-tooltip-bg, #ffffff)',
+                    border: '1px solid var(--chart-tooltip-border, #e2e8f0)',
+                    borderRadius: '8px',
+                    color: 'var(--chart-tooltip-text, #0f172a)',
+                  }}
                   formatter={(value: number) =>
                     new Intl.NumberFormat('nb-NO', {
                       style: 'currency',
@@ -209,9 +230,12 @@ export default function DashboardPage() {
       {!isLoading && expenseByCategory.length === 0 && (
         <Card>
           <CardContent className="pt-6">
-            <p className="text-center text-slate-500">
+            <p className="text-center text-slate-500 dark:text-slate-400">
               No transactions this month.{' '}
-              <Link to="/transactions/new" className="underline text-slate-900">
+              <Link
+                to="/transactions/new"
+                className="underline text-indigo-600 dark:text-indigo-400"
+              >
                 Add your first one.
               </Link>
             </p>

@@ -15,3 +15,5 @@ export {
 export { Badge, badgeVariants } from './components/badge';
 export type { BadgeProps } from './components/badge';
 export { Separator } from './components/separator';
+export { ThemeProvider, useTheme } from './ThemeContext';
+export { ThemeToggle } from './components/ThemeToggle';

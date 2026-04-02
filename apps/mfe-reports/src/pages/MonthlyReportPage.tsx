@@ -43,7 +43,7 @@ function pctChange(current: number, previous: number): number | null {
 }
 
 const COLORS = [
-  '#3b82f6',
+  '#6366f1',
   '#10b981',
   '#f59e0b',
   '#ef4444',
@@ -68,10 +68,14 @@ export default function MonthlyReportPage() {
   if (!householdId) {
     return (
       <div className="flex flex-col gap-4">
-        <h1 className="text-2xl font-semibold">Monthly Report</h1>
+        <h1 className="text-2xl font-semibold dark:text-slate-100">
+          Monthly Report
+        </h1>
         <Card>
           <CardContent className="pt-6">
-            <p className="text-slate-500">No household selected.</p>
+            <p className="text-slate-500 dark:text-slate-400">
+              No household selected.
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -80,10 +84,7 @@ export default function MonthlyReportPage() {
 
   const expenseBreakdown = (report?.categoryBreakdown ?? [])
     .filter((c) => c.type === 'expense')
-    .map((c) => ({
-      name: c.categoryId,
-      amount: c.total / 100,
-    }))
+    .map((c) => ({ name: c.categoryId, amount: c.total / 100 }))
     .sort((a, b) => b.amount - a.amount);
 
   const incomePct =
@@ -108,15 +109,15 @@ export default function MonthlyReportPage() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">Monthly Report</h1>
-        </div>
+        <h1 className="text-2xl font-semibold dark:text-slate-100">
+          Monthly Report
+        </h1>
         <div className="flex items-center gap-3">
           <input
             type="month"
             value={month}
             onChange={(e) => setMonth(e.target.value)}
-            className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400"
+            className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
           />
           <Button
             variant="outline"
@@ -130,22 +131,21 @@ export default function MonthlyReportPage() {
         </div>
       </div>
 
-      {/* Summary cards */}
       <div className="grid gap-4 sm:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-slate-500">
+            <CardTitle className="text-sm font-medium text-slate-500 dark:text-slate-400">
               Total Income
             </CardTitle>
             <TrendingUp className="h-4 w-4 text-emerald-500" />
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold text-emerald-600">
+            <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
               {isLoading ? '—' : formatCurrency(report?.totalIncome ?? 0)}
             </p>
             {incomePct !== null && (
               <p
-                className={`text-xs mt-1 ${incomePct >= 0 ? 'text-emerald-600' : 'text-red-600'}`}
+                className={`text-xs mt-1 ${incomePct >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}
               >
                 {incomePct >= 0 ? '+' : ''}
                 {incomePct}% vs previous month
@@ -156,18 +156,18 @@ export default function MonthlyReportPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-slate-500">
+            <CardTitle className="text-sm font-medium text-slate-500 dark:text-slate-400">
               Total Expenses
             </CardTitle>
             <TrendingDown className="h-4 w-4 text-red-500" />
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold text-red-600">
+            <p className="text-2xl font-bold text-red-600 dark:text-red-400">
               {isLoading ? '—' : formatCurrency(report?.totalExpense ?? 0)}
             </p>
             {expensePct !== null && (
               <p
-                className={`text-xs mt-1 ${expensePct <= 0 ? 'text-emerald-600' : 'text-red-600'}`}
+                className={`text-xs mt-1 ${expensePct <= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}
               >
                 {expensePct >= 0 ? '+' : ''}
                 {expensePct}% vs previous month
@@ -178,14 +178,14 @@ export default function MonthlyReportPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-slate-500">
+            <CardTitle className="text-sm font-medium text-slate-500 dark:text-slate-400">
               Net
             </CardTitle>
-            <Wallet className="h-4 w-4 text-slate-500" />
+            <Wallet className="h-4 w-4 text-slate-500 dark:text-slate-400" />
           </CardHeader>
           <CardContent>
             <p
-              className={`text-2xl font-bold ${(report?.net ?? 0) >= 0 ? 'text-emerald-600' : 'text-red-600'}`}
+              className={`text-2xl font-bold ${(report?.net ?? 0) >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}
             >
               {isLoading ? '—' : formatCurrency(report?.net ?? 0)}
             </p>
@@ -193,11 +193,12 @@ export default function MonthlyReportPage() {
         </Card>
       </div>
 
-      {/* Category breakdown chart */}
       {!isLoading && expenseBreakdown.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Expense by category</CardTitle>
+            <CardTitle className="dark:text-slate-100">
+              Expense by category
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={280}>
@@ -205,15 +206,19 @@ export default function MonthlyReportPage() {
                 data={expenseBreakdown}
                 margin={{ top: 4, right: 8, left: 8, bottom: 40 }}
               >
-                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  vertical={false}
+                  stroke="var(--chart-grid, #e2e8f0)"
+                />
                 <XAxis
                   dataKey="name"
-                  tick={{ fontSize: 12 }}
+                  tick={{ fontSize: 12, fill: 'var(--chart-text, #64748b)' }}
                   angle={-35}
                   textAnchor="end"
                 />
                 <YAxis
-                  tick={{ fontSize: 12 }}
+                  tick={{ fontSize: 12, fill: 'var(--chart-text, #64748b)' }}
                   tickFormatter={(v: number) =>
                     new Intl.NumberFormat('nb-NO', {
                       notation: 'compact',
@@ -221,6 +226,12 @@ export default function MonthlyReportPage() {
                   }
                 />
                 <Tooltip
+                  contentStyle={{
+                    background: 'var(--chart-tooltip-bg, #ffffff)',
+                    border: '1px solid var(--chart-tooltip-border, #e2e8f0)',
+                    borderRadius: '8px',
+                    color: 'var(--chart-tooltip-text, #0f172a)',
+                  }}
                   formatter={(value: number) =>
                     new Intl.NumberFormat('nb-NO', {
                       style: 'currency',
@@ -243,7 +254,7 @@ export default function MonthlyReportPage() {
       {!isLoading && expenseBreakdown.length === 0 && (
         <Card>
           <CardContent className="pt-6">
-            <p className="text-center text-slate-500">
+            <p className="text-center text-slate-500 dark:text-slate-400">
               No expense data for this month.
             </p>
           </CardContent>

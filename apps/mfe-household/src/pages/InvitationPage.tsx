@@ -20,7 +20,6 @@ export default function InvitationPage() {
   const navigate = useNavigate();
   const auth = useContext(AuthContext);
 
-  // If user is not logged in, store token and redirect to login
   if (!auth?.accessToken) {
     sessionStorage.setItem('pendingInvitationToken', token ?? '');
     navigate(`/login?next=/invitations/${token ?? ''}`);
@@ -58,25 +57,25 @@ function InvitationAcceptView({ token }: { token: string }) {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p className="text-slate-500">Validating invitation…</p>
+      <div className="flex min-h-screen items-center justify-center dark:bg-slate-900">
+        <p className="text-slate-500 dark:text-slate-400">
+          Validating invitation…
+        </p>
       </div>
     );
   }
 
-  const axiosError = error as {
-    response?: { status: number };
-  } | null;
+  const axiosError = error as { response?: { status: number } } | null;
 
   if (axiosError?.response?.status === 410) {
     return (
-      <div className="flex min-h-screen items-center justify-center px-4">
+      <div className="flex min-h-screen items-center justify-center px-4 dark:bg-slate-900">
         <Card className="max-w-sm w-full">
           <CardHeader>
             <CardTitle>Invitation expired or already used</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-slate-500 dark:text-slate-400">
               This invitation has expired or has already been accepted. Ask a
               household admin to send a new invitation.
             </p>
@@ -91,13 +90,13 @@ function InvitationAcceptView({ token }: { token: string }) {
 
   if (axiosError?.response?.status === 403) {
     return (
-      <div className="flex min-h-screen items-center justify-center px-4">
+      <div className="flex min-h-screen items-center justify-center px-4 dark:bg-slate-900">
         <Card className="max-w-sm w-full">
           <CardHeader>
             <CardTitle>Wrong account</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-slate-500 dark:text-slate-400">
               This invitation was sent to a different email address. Log out and
               sign in with the invited email, or ask the admin to re-invite your
               current account.
@@ -113,13 +112,13 @@ function InvitationAcceptView({ token }: { token: string }) {
 
   if (error || !invitation) {
     return (
-      <div className="flex min-h-screen items-center justify-center px-4">
+      <div className="flex min-h-screen items-center justify-center px-4 dark:bg-slate-900">
         <Card className="max-w-sm w-full">
           <CardHeader>
             <CardTitle>Invalid invitation</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-slate-500 dark:text-slate-400">
               This invitation link is not valid.
             </p>
             <Button asChild className="mt-4" variant="outline">
@@ -132,17 +131,17 @@ function InvitationAcceptView({ token }: { token: string }) {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
+    <div className="flex min-h-screen items-center justify-center px-4 dark:bg-slate-900">
       <Card className="max-w-sm w-full">
         <CardHeader>
           <CardTitle>You&apos;re invited!</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-slate-600 dark:text-slate-300">
             You&apos;ve been invited to join{' '}
             <span className="font-semibold">{invitation.householdName}</span>.
           </p>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
             Invitation for: {invitation.email}
           </p>
 

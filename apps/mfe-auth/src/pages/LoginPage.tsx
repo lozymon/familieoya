@@ -1,10 +1,9 @@
 import '../styles.css';
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link, useNavigate } from 'react-router-dom';
-import { Input } from '@familieoya/ui';
+import { ThemeProvider, useTheme, ThemeToggle } from '@familieoya/ui';
 import { useAuth } from '../hooks/useAuth';
 
 const schema = z.object({
@@ -14,70 +13,10 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>;
 
-const dark = {
-  page: { background: '#0f172a' },
-  brand: { color: '#f8fafc' },
-  tagline: { color: '#64748b' },
-  card: {
-    background: '#1e293b',
-    border: '1px solid #334155',
-    boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
-  },
-  heading: { color: '#f1f5f9' },
-  subheading: { color: '#64748b' },
-  label: { color: '#cbd5e1' },
-  input: { background: '#0f172a', borderColor: '#334155', color: '#f1f5f9' },
-  errorBox: {
-    background: 'rgba(239,68,68,0.1)',
-    border: '1px solid rgba(239,68,68,0.3)',
-    color: '#fca5a5',
-  },
-  errorText: { color: '#f87171' },
-  footer: { color: '#64748b' },
-  link: { color: '#818cf8' },
-  toggle: {
-    background: '#1e293b',
-    border: '1px solid #334155',
-    color: '#94a3b8',
-  },
-} as const;
-
-const light = {
-  page: { background: '#f1f5f9' },
-  brand: { color: '#0f172a' },
-  tagline: { color: '#64748b' },
-  card: {
-    background: '#ffffff',
-    border: '1px solid #e2e8f0',
-    boxShadow: '0 10px 40px -8px rgba(0,0,0,0.12)',
-  },
-  heading: { color: '#0f172a' },
-  subheading: { color: '#64748b' },
-  label: { color: '#374151' },
-  input: { background: '#f8fafc', borderColor: '#d1d5db', color: '#111827' },
-  errorBox: {
-    background: '#fef2f2',
-    border: '1px solid #fecaca',
-    color: '#dc2626',
-  },
-  errorText: { color: '#dc2626' },
-  footer: { color: '#6b7280' },
-  link: { color: '#6366f1' },
-  toggle: {
-    background: '#ffffff',
-    border: '1px solid #e2e8f0',
-    color: '#64748b',
-  },
-} as const;
-
-export default function LoginPage() {
+function LoginForm() {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [isDark, setIsDark] = useState(
-    () => window.matchMedia('(prefers-color-scheme: dark)').matches,
-  );
-
-  const t = isDark ? dark : light;
+  const { isDark } = useTheme();
 
   const {
     register,
@@ -97,6 +36,12 @@ export default function LoginPage() {
     }
   };
 
+  const inputStyle = {
+    background: isDark ? '#0f172a' : '#f8fafc',
+    borderColor: isDark ? '#334155' : '#d1d5db',
+    color: isDark ? '#f1f5f9' : '#111827',
+  };
+
   return (
     <div
       style={{
@@ -105,62 +50,13 @@ export default function LoginPage() {
         alignItems: 'center',
         justifyContent: 'center',
         padding: '1rem',
+        background: isDark ? '#0f172a' : '#f1f5f9',
         transition: 'background 0.2s',
-        ...t.page,
       }}
     >
-      {/* Theme toggle */}
-      <button
-        onClick={() => setIsDark((d) => !d)}
-        aria-label="Toggle theme"
-        style={{
-          position: 'fixed',
-          top: '1rem',
-          right: '1rem',
-          width: '36px',
-          height: '36px',
-          borderRadius: '8px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          cursor: 'pointer',
-          transition: 'all 0.2s',
-          ...t.toggle,
-        }}
-      >
-        {isDark ? (
-          /* Sun */
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <circle cx="12" cy="12" r="4" />
-            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
-          </svg>
-        ) : (
-          /* Moon */
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-          </svg>
-        )}
-      </button>
+      <div style={{ position: 'fixed', top: '1rem', right: '1rem' }}>
+        <ThemeToggle />
+      </div>
 
       <div style={{ width: '100%', maxWidth: '400px' }}>
         {/* Brand */}
@@ -194,8 +90,7 @@ export default function LoginPage() {
               fontWeight: 600,
               letterSpacing: '-0.01em',
               margin: 0,
-              transition: 'color 0.2s',
-              ...t.brand,
+              color: isDark ? '#f8fafc' : '#0f172a',
             }}
           >
             Familieoya
@@ -204,8 +99,7 @@ export default function LoginPage() {
             style={{
               fontSize: '0.8125rem',
               marginTop: '4px',
-              transition: 'color 0.2s',
-              ...t.tagline,
+              color: '#64748b',
             }}
           >
             Family budget, simplified
@@ -217,8 +111,12 @@ export default function LoginPage() {
           style={{
             borderRadius: '12px',
             padding: '2rem',
+            background: isDark ? '#1e293b' : '#ffffff',
+            border: `1px solid ${isDark ? '#334155' : '#e2e8f0'}`,
+            boxShadow: isDark
+              ? '0 25px 50px -12px rgba(0,0,0,0.5)'
+              : '0 10px 40px -8px rgba(0,0,0,0.12)',
             transition: 'all 0.2s',
-            ...t.card,
           }}
         >
           <div style={{ marginBottom: '1.5rem' }}>
@@ -227,20 +125,12 @@ export default function LoginPage() {
                 fontSize: '1.25rem',
                 fontWeight: 600,
                 margin: '0 0 4px',
-                transition: 'color 0.2s',
-                ...t.heading,
+                color: isDark ? '#f1f5f9' : '#0f172a',
               }}
             >
               Welcome back
             </h2>
-            <p
-              style={{
-                fontSize: '0.875rem',
-                margin: 0,
-                transition: 'color 0.2s',
-                ...t.subheading,
-              }}
-            >
+            <p style={{ fontSize: '0.875rem', margin: 0, color: '#64748b' }}>
               Sign in to your account to continue
             </p>
           </div>
@@ -258,22 +148,39 @@ export default function LoginPage() {
                 style={{
                   fontSize: '0.875rem',
                   fontWeight: 500,
-                  transition: 'color 0.2s',
-                  ...t.label,
+                  color: isDark ? '#cbd5e1' : '#374151',
                 }}
               >
                 Email
               </label>
-              <Input
+              <input
                 id="email"
                 type="email"
                 autoComplete="email"
                 placeholder="you@example.com"
-                style={{ transition: 'all 0.2s', ...t.input }}
+                style={{
+                  height: '40px',
+                  width: '100%',
+                  borderRadius: '6px',
+                  border: `1px solid ${inputStyle.borderColor}`,
+                  background: inputStyle.background,
+                  color: inputStyle.color,
+                  padding: '0 12px',
+                  fontSize: '0.875rem',
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                  transition: 'border-color 0.15s',
+                }}
                 {...register('email')}
               />
               {errors.email && (
-                <p style={{ fontSize: '0.8125rem', margin: 0, ...t.errorText }}>
+                <p
+                  style={{
+                    color: isDark ? '#f87171' : '#dc2626',
+                    fontSize: '0.8125rem',
+                    margin: 0,
+                  }}
+                >
                   {errors.email.message}
                 </p>
               )}
@@ -294,8 +201,7 @@ export default function LoginPage() {
                   style={{
                     fontSize: '0.875rem',
                     fontWeight: 500,
-                    transition: 'color 0.2s',
-                    ...t.label,
+                    color: isDark ? '#cbd5e1' : '#374151',
                   }}
                 >
                   Password
@@ -311,15 +217,33 @@ export default function LoginPage() {
                   Forgot password?
                 </Link>
               </div>
-              <Input
+              <input
                 id="password"
                 type="password"
                 autoComplete="current-password"
-                style={{ transition: 'all 0.2s', ...t.input }}
+                style={{
+                  height: '40px',
+                  width: '100%',
+                  borderRadius: '6px',
+                  border: `1px solid ${inputStyle.borderColor}`,
+                  background: inputStyle.background,
+                  color: inputStyle.color,
+                  padding: '0 12px',
+                  fontSize: '0.875rem',
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                  transition: 'border-color 0.15s',
+                }}
                 {...register('password')}
               />
               {errors.password && (
-                <p style={{ fontSize: '0.8125rem', margin: 0, ...t.errorText }}>
+                <p
+                  style={{
+                    color: isDark ? '#f87171' : '#dc2626',
+                    fontSize: '0.8125rem',
+                    margin: 0,
+                  }}
+                >
                   {errors.password.message}
                 </p>
               )}
@@ -331,7 +255,9 @@ export default function LoginPage() {
                   borderRadius: '6px',
                   padding: '10px 12px',
                   fontSize: '0.875rem',
-                  ...t.errorBox,
+                  background: isDark ? 'rgba(239,68,68,0.1)' : '#fef2f2',
+                  border: `1px solid ${isDark ? 'rgba(239,68,68,0.3)' : '#fecaca'}`,
+                  color: isDark ? '#fca5a5' : '#dc2626',
                 }}
               >
                 {errors.root.message}
@@ -370,8 +296,7 @@ export default function LoginPage() {
                 textAlign: 'center',
                 fontSize: '0.875rem',
                 margin: '4px 0 0',
-                transition: 'color 0.2s',
-                ...t.footer,
+                color: '#64748b',
               }}
             >
               Don&apos;t have an account?{' '}
@@ -380,8 +305,7 @@ export default function LoginPage() {
                 style={{
                   fontWeight: 500,
                   textDecoration: 'none',
-                  transition: 'color 0.2s',
-                  ...t.link,
+                  color: isDark ? '#818cf8' : '#6366f1',
                 }}
               >
                 Create one
@@ -391,5 +315,13 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <ThemeProvider>
+      <LoginForm />
+    </ThemeProvider>
   );
 }

@@ -119,9 +119,8 @@ export default function CategoriesPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-semibold">Categories</h1>
+      <h1 className="text-2xl font-semibold dark:text-slate-100">Categories</h1>
 
-      {/* Add new */}
       <Card className="max-w-md">
         <CardHeader>
           <CardTitle className="text-base">Add custom category</CardTitle>
@@ -155,19 +154,22 @@ export default function CategoriesPage() {
         </CardContent>
       </Card>
 
-      {/* Seeded categories */}
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Default categories</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           {isLoading ? (
-            <p className="px-4 py-3 text-sm text-slate-500">Loading…</p>
+            <p className="px-4 py-3 text-sm text-slate-500 dark:text-slate-400">
+              Loading…
+            </p>
           ) : (
-            <ul className="divide-y divide-slate-100">
+            <ul className="divide-y divide-slate-100 dark:divide-slate-700">
               {seeded.map((c) => (
                 <li key={c.id} className="flex items-center px-4 py-3">
-                  <span className="flex-1 text-sm">{c.name}</span>
+                  <span className="flex-1 text-sm dark:text-slate-200">
+                    {c.name}
+                  </span>
                   <Badge variant="secondary" className="text-xs">
                     {c.key}
                   </Badge>
@@ -178,21 +180,22 @@ export default function CategoriesPage() {
         </CardContent>
       </Card>
 
-      {/* Custom categories */}
       {custom.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Custom categories</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
-            <ul className="divide-y divide-slate-100">
+            <ul className="divide-y divide-slate-100 dark:divide-slate-700">
               {custom.map((c) => (
                 <li key={c.id} className="flex items-center gap-2 px-4 py-3">
                   {editingId === c.id ? (
                     <EditRow category={c} onDone={() => setEditingId(null)} />
                   ) : (
                     <>
-                      <span className="flex-1 text-sm">{c.name}</span>
+                      <span className="flex-1 text-sm dark:text-slate-200">
+                        {c.name}
+                      </span>
                       <Button
                         size="icon"
                         variant="ghost"
@@ -204,7 +207,7 @@ export default function CategoriesPage() {
                       <Button
                         size="icon"
                         variant="ghost"
-                        className="h-8 w-8 text-red-500 hover:text-red-600"
+                        className="h-8 w-8 text-red-500 hover:text-red-600 dark:text-red-400"
                         onClick={() => remove(c.id)}
                       >
                         <Trash2 className="h-4 w-4" />

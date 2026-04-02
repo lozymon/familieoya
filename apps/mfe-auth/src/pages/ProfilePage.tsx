@@ -103,14 +103,16 @@ export default function ProfilePage() {
                 value={user?.email ?? ''}
                 disabled
               />
-              <p className="text-xs text-slate-500">Email cannot be changed.</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Email cannot be changed.
+              </p>
             </div>
 
             <div className="space-y-1">
               <Label htmlFor="preferredLanguage">Language</Label>
               <select
                 id="preferredLanguage"
-                className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900"
+                className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
                 {...register('preferredLanguage')}
               >
                 <option value="en">English</option>
@@ -139,7 +141,7 @@ export default function ProfilePage() {
             <label key={key} className="flex items-center gap-3 cursor-pointer">
               <input
                 type="checkbox"
-                className="h-4 w-4 rounded border-slate-300"
+                className="h-4 w-4 rounded border-slate-300 dark:border-slate-600 accent-indigo-600"
                 checked={prefs?.[key as keyof typeof prefs] ?? true}
                 onChange={(e) => {
                   void updatePrefsMutation.mutateAsync({
@@ -147,7 +149,7 @@ export default function ProfilePage() {
                   });
                 }}
               />
-              <span className="text-sm">{label}</span>
+              <span className="text-sm dark:text-slate-200">{label}</span>
             </label>
           ))}
         </CardContent>

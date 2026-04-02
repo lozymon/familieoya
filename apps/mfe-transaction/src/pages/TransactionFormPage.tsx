@@ -66,7 +66,6 @@ export default function TransactionFormPage() {
     },
   });
 
-  // Pre-fill form when editing
   useEffect(() => {
     if (existing) {
       reset({
@@ -113,7 +112,7 @@ export default function TransactionFormPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold">
+      <h1 className="text-2xl font-semibold dark:text-slate-100">
         {isEdit ? 'Edit transaction' : 'Add transaction'}
       </h1>
 
@@ -127,7 +126,6 @@ export default function TransactionFormPage() {
             className="space-y-4"
             noValidate
           >
-            {/* Type toggle */}
             <div className="space-y-1">
               <Label>Type</Label>
               <div className="flex gap-2">
@@ -139,9 +137,9 @@ export default function TransactionFormPage() {
                     className={`flex-1 rounded-md border py-2 text-sm font-medium transition-colors ${
                       selectedType === t
                         ? t === 'expense'
-                          ? 'border-red-500 bg-red-50 text-red-700'
-                          : 'border-emerald-500 bg-emerald-50 text-emerald-700'
-                        : 'border-slate-200 text-slate-500 hover:bg-slate-50'
+                          ? 'border-red-500 bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400 dark:border-red-700'
+                          : 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-700'
+                        : 'border-slate-200 text-slate-500 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-700'
                     }`}
                   >
                     {t.charAt(0).toUpperCase() + t.slice(1)}
@@ -171,7 +169,7 @@ export default function TransactionFormPage() {
               <select
                 id="categoryId"
                 {...register('categoryId')}
-                className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400"
+                className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
               >
                 <option value="">Select category…</option>
                 {categories.map((c) => (

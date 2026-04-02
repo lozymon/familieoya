@@ -2,7 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Bell, User, LogOut } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { getNotifications } from '@familieoya/api-client';
-import { Badge, Button } from '@familieoya/ui';
+import { Badge, Button, ThemeToggle } from '@familieoya/ui';
 import { useAuth } from '../contexts/AuthContext';
 
 export function TopBar() {
@@ -23,12 +23,14 @@ export function TopBar() {
   };
 
   return (
-    <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-6">
+    <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-6 dark:border-slate-800 dark:bg-slate-900">
       <div />
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
+        <ThemeToggle />
+
         <Link
           to="/notifications"
-          className="relative inline-flex items-center justify-center h-10 w-10 rounded-md hover:bg-slate-100"
+          className="relative inline-flex h-9 w-9 items-center justify-center rounded-md text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
         >
           <Bell className="h-5 w-5" />
           {unreadCount > 0 && (
@@ -40,16 +42,20 @@ export function TopBar() {
 
         <Link
           to="/profile"
-          className="inline-flex items-center justify-center h-10 w-10 rounded-md hover:bg-slate-100"
+          className="inline-flex h-9 w-9 items-center justify-center rounded-md text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
         >
           <User className="h-5 w-5" />
         </Link>
 
+        {user && (
+          <span className="text-sm text-slate-600 dark:text-slate-400">
+            {user.name}
+          </span>
+        )}
+
         <Button variant="ghost" size="icon" onClick={() => void handleLogout()}>
           <LogOut className="h-5 w-5" />
         </Button>
-
-        {user && <span className="text-sm text-slate-600">{user.name}</span>}
       </div>
     </header>
   );
