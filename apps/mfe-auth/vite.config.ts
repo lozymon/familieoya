@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import federation from '@originjs/vite-plugin-federation';
+import path from 'path';
 
 export default defineConfig(async () => {
   const { default: tailwindcss } = await import('@tailwindcss/vite');
@@ -27,6 +28,13 @@ export default defineConfig(async () => {
     ],
     resolve: {
       conditions: ['@familieoya/source'],
+      alias: {
+        '@familieoya/ui': path.resolve(__dirname, '../../libs/ui/src/index.ts'),
+        '@familieoya/api-client': path.resolve(
+          __dirname,
+          '../../libs/api-client/src/index.ts',
+        ),
+      },
     },
     server: {
       port: 4201,

@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import federation from '@originjs/vite-plugin-federation';
+import path from 'path';
 
 export default defineConfig({
   plugins: [
@@ -22,7 +23,16 @@ export default defineConfig({
       },
     }),
   ],
-  resolve: { conditions: ['@familieoya/source'] },
+  resolve: {
+    conditions: ['@familieoya/source'],
+    alias: {
+      '@familieoya/ui': path.resolve(__dirname, '../../libs/ui/src/index.ts'),
+      '@familieoya/api-client': path.resolve(
+        __dirname,
+        '../../libs/api-client/src/index.ts',
+      ),
+    },
+  },
   server: { port: 4202 },
   preview: { port: 4202 },
   build: {

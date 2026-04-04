@@ -1,6 +1,10 @@
 FROM node:24-alpine AS builder
 WORKDIR /app
 COPY package*.json ./
+COPY libs/contracts/package.json libs/contracts/
+COPY libs/common/package.json libs/common/
+COPY libs/testing/package.json libs/testing/
+COPY apps/notification-service/package.json apps/notification-service/
 RUN npm ci --legacy-peer-deps
 COPY . .
 RUN npx tsc --build libs/contracts/tsconfig.lib.json
