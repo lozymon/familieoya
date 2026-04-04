@@ -245,6 +245,63 @@ _Goal: Complete the full feature set_
 
 ---
 
+## Phase 7c — UI Facelift (Week 12–13)
+
+_Goal: Replace the basic placeholder UI with a professional finance app look-and-feel_
+
+See `docs/design-system.md` for the full design direction, color tokens, component specs, and implementation rationale.
+
+**Design tokens:**
+
+- [ ] Create `libs/ui/src/styles/tokens.css` — all colors as CSS custom properties (bg, surface, text, primary, income, expense, warning, chart sequence)
+- [ ] Wire tokens into Tailwind config as `theme.extend.colors` aliases
+- [ ] Replace all hardcoded hex values in existing components with token references
+- [ ] Switch primary accent from indigo → emerald across Button, Badge, Input focus ring
+
+**Shell layout:**
+
+- [ ] Sidebar: add nav group section labels (Overview / Money / Household)
+- [ ] Sidebar: new active state — left border `border-l-2 border-primary` instead of full background fill
+- [ ] Sidebar: distinct background color (`--color-sidebar-bg`) separate from page background
+- [ ] TopBar: add household name display, clean up spacing, move theme toggle to consistent position
+- [ ] Content area: wrap all page content in `max-w-5xl mx-auto px-6 py-8` container
+
+**`libs/ui` new components:**
+
+- [ ] `Stat` — KPI card with label, large amount, trend badge (↑/↓ + %) and comparison line
+- [ ] `ProgressBar` — budget progress bar, color transitions emerald → amber → rose based on percentage
+- [ ] `EmptyState` — icon + title + description + optional CTA button, used on all empty lists
+
+**Dashboard (mfe-transaction):**
+
+- [ ] KPI stat row: Income, Expenses, Net, Savings rate — using new `Stat` component
+- [ ] Trend indicators comparing to previous month
+- [ ] Recent transactions list below chart (last 5 rows, link to full list)
+- [ ] Clean up chart: use `--chart-*` token colors, better axis labels
+
+**Transactions page (mfe-transaction):**
+
+- [ ] Table: zebra striping, sticky header, right-aligned amounts with `tabular-nums`
+- [ ] Filters: move to a clean filter bar above the table
+- [ ] Bulk delete: contextual action bar that slides in when rows are selected
+- [ ] Empty state when no transactions / no filter results
+
+**Remaining pages:**
+
+- [ ] Budget page: progress bars per category using `ProgressBar` component
+- [ ] Household page: member list card redesign, roles as styled badges
+- [ ] Settings page: tab sidebar layout (not horizontal tab bar)
+- [ ] Login/Register: centered card layout, remove all inline styles, use `libs/ui` components
+
+**Playwright visual workflow:**
+
+- [ ] Start the frontend and use Playwright MCP to screenshot all pages before starting
+- [ ] Take after screenshots at the end of each step to review progress
+
+**Milestone:** Every page looks like a professional finance app — consistent tokens, no hardcoded colors, no placeholder layouts
+
+---
+
 ## Phase 8 — Budget MFE + i18n + Full Integration (Week 13–14)
 
 _Goal: Budget status visible; full saga visible in browser; app available in 3 languages_
