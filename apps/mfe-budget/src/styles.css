@@ -10,8 +10,3 @@ body {
   margin: 0;
   padding: 0;
 }
-
-/* Auth panel — explicit class so Tailwind JIT picks it up in preview builds */
-.auth-brand-panel {
-  background-color: #047857; /* emerald-700 */
-}

@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { UserPlus, Crown, Trash2 } from 'lucide-react';
+import { UserPlus, Crown, Trash2, Home } from 'lucide-react';
 import {
   Button,
   Card,
@@ -14,7 +14,6 @@ import {
   Input,
   Label,
   Badge,
-  Separator,
 } from '@familieoya/ui';
 import {
   getHousehold,
@@ -38,78 +37,6 @@ const inviteSchema = z.object({
 type CreateFormValues = z.infer<typeof createSchema>;
 type InviteFormValues = z.infer<typeof inviteSchema>;
 
-function CreateHouseholdForm({
-  onCreated,
-}: {
-  onCreated: (id: string) => void;
-}) {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-    setError,
-  } = useForm<CreateFormValues>({
-    resolver: zodResolver(createSchema),
-    defaultValues: { currency: 'NOK' },
-  });
-
-  const { mutate } = useMutation({
-    mutationFn: (values: CreateFormValues) =>
-      createHousehold({ name: values.name, currency: values.currency }),
-    onSuccess: (household) => onCreated(household.id),
-    onError: () => setError('root', { message: 'Failed to create household.' }),
-  });
-
-  return (
-    <Card className="max-w-md">
-      <CardHeader>
-        <CardTitle>Create your household</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form
-          onSubmit={handleSubmit((v) => mutate(v))}
-          className="space-y-4"
-          noValidate
-        >
-          <div className="space-y-1">
-            <Label htmlFor="name">Household name</Label>
-            <Input
-              id="name"
-              placeholder="e.g. The Smiths"
-              {...register('name')}
-            />
-            {errors.name && (
-              <p className="text-sm text-red-500">{errors.name.message}</p>
-            )}
-          </div>
-
-          <div className="space-y-1">
-            <Label htmlFor="currency">Currency</Label>
-            <Input
-              id="currency"
-              placeholder="NOK"
-              maxLength={3}
-              className="uppercase"
-              {...register('currency')}
-            />
-            {errors.currency && (
-              <p className="text-sm text-red-500">{errors.currency.message}</p>
-            )}
-          </div>
-
-          {errors.root && (
-            <p className="text-sm text-red-500">{errors.root.message}</p>
-          )}
-
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? 'Creating…' : 'Create household'}
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
-  );
-}
-
 export default function HouseholdPage() {
   const auth = useContext(AuthContext);
   const householdId = auth?.activeHouseholdId;
@@ -124,12 +51,30 @@ export default function HouseholdPage() {
   });
 
   const {
+    register: registerCreate,
+    handleSubmit: handleCreate,
+    formState: { errors: createErrors, isSubmitting: isCreating },
+    setError: setCreateError,
+  } = useForm<CreateFormValues>({
+    resolver: zodResolver(createSchema),
+    defaultValues: { currency: 'NOK' },
+  });
+
+  const {
     register: registerInvite,
     handleSubmit: handleInvite,
     reset: resetInvite,
     formState: { errors: inviteErrors, isSubmitting: isInviting },
     setError: setInviteError,
   } = useForm<InviteFormValues>({ resolver: zodResolver(inviteSchema) });
+
+  const { mutate: createH } = useMutation({
+    mutationFn: (values: CreateFormValues) =>
+      createHousehold({ name: values.name, currency: values.currency }),
+    onSuccess: (h) => auth?.setActiveHouseholdId(h.id),
+    onError: () =>
+      setCreateError('root', { message: 'Failed to create household.' }),
+  });
 
   const { mutate: sendInvite } = useMutation({
     mutationFn: (values: InviteFormValues) =>
@@ -146,7 +91,9 @@ export default function HouseholdPage() {
   const { mutate: removeUser } = useMutation({
     mutationFn: (userId: string) => removeMember(householdId!, userId),
     onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ['household', householdId] }),
+      void queryClient.invalidateQueries({
+        queryKey: ['household', householdId],
+      }),
   });
 
   const { mutate: changeRole } = useMutation({
@@ -158,7 +105,9 @@ export default function HouseholdPage() {
       role: 'admin' | 'member';
     }) => updateMemberRole(householdId!, userId, role),
     onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ['household', householdId] }),
+      void queryClient.invalidateQueries({
+        queryKey: ['household', householdId],
+      }),
   });
 
   const currentMember = household?.members.find(
@@ -166,78 +115,157 @@ export default function HouseholdPage() {
   );
   const isAdmin = currentMember?.role === 'admin';
 
+  /* ── No household ─────────────────────────────────────────── */
   if (!householdId) {
     return (
-      <div className="flex flex-col gap-6">
-        <h1 className="text-2xl font-semibold dark:text-slate-100">
-          Household
-        </h1>
-        <p className="text-slate-500 dark:text-slate-400">
-          You don&apos;t have a household yet. Create one below, or accept an
-          invitation link from a household admin.
-        </p>
-        <CreateHouseholdForm
-          onCreated={(id) => auth?.setActiveHouseholdId(id)}
-        />
+      <div className="flex flex-col gap-8">
+        <div>
+          <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
+            Household
+          </h1>
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+            Create a household or join one via invitation
+          </p>
+        </div>
+
+        <Card>
+          <CardContent className="flex flex-col items-center gap-8 py-12">
+            {/* Icon + messaging */}
+            <div className="flex flex-col items-center gap-3 text-center">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800">
+                <Home className="h-7 w-7 text-zinc-400 dark:text-zinc-500" />
+              </div>
+              <div>
+                <p className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+                  No household yet
+                </p>
+                <p className="mt-1 max-w-sm text-sm text-zinc-500 dark:text-zinc-400">
+                  A household groups your family&apos;s budgets, transactions,
+                  and members in one place. Create yours below or accept an
+                  invitation from an admin.
+                </p>
+              </div>
+            </div>
+
+            {/* Divider */}
+            <div className="w-full max-w-sm border-t border-zinc-100 dark:border-zinc-800" />
+
+            {/* Create form */}
+            <form
+              onSubmit={handleCreate((v) => createH(v))}
+              noValidate
+              className="flex w-full max-w-sm flex-col gap-4"
+            >
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="name">Household name</Label>
+                <Input
+                  id="name"
+                  placeholder="e.g. The Smiths"
+                  {...registerCreate('name')}
+                />
+                {createErrors.name && (
+                  <p className="text-xs text-rose-600 dark:text-rose-400">
+                    {createErrors.name.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="currency">Currency</Label>
+                <Input
+                  id="currency"
+                  placeholder="NOK"
+                  maxLength={3}
+                  className="uppercase"
+                  {...registerCreate('currency')}
+                />
+                {createErrors.currency && (
+                  <p className="text-xs text-rose-600 dark:text-rose-400">
+                    {createErrors.currency.message}
+                  </p>
+                )}
+              </div>
+
+              {createErrors.root && (
+                <p className="text-xs text-rose-600 dark:text-rose-400">
+                  {createErrors.root.message}
+                </p>
+              )}
+
+              <Button type="submit" disabled={isCreating} className="w-full">
+                {isCreating ? 'Creating…' : 'Create household'}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
+  /* ── Loading ──────────────────────────────────────────────── */
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-4">
-        <h1 className="text-2xl font-semibold dark:text-slate-100">
-          Household
-        </h1>
-        <p className="text-slate-500 dark:text-slate-400">Loading…</p>
+      <div className="flex flex-col gap-8">
+        <div>
+          <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
+            Household
+          </h1>
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+            Loading…
+          </p>
+        </div>
       </div>
     );
   }
 
   if (!household) return null;
 
+  /* ── Has household ────────────────────────────────────────── */
   return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-semibold dark:text-slate-100">
-          {household.name}
-        </h1>
-        <p className="text-sm text-slate-500 dark:text-slate-400">
-          Currency: {household.currency} · {household.members.length}{' '}
-          {household.members.length === 1 ? 'member' : 'members'}
-        </p>
+    <div className="flex flex-col gap-8">
+      {/* Page header */}
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
+            {household.name}
+          </h1>
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+            {household.currency} ·{' '}
+            {household.members.length === 1
+              ? '1 member'
+              : `${household.members.length} members`}
+          </p>
+        </div>
       </div>
 
+      {/* Members list */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Members</CardTitle>
+          <CardTitle className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+            Members
+          </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          <ul className="divide-y divide-slate-100 dark:divide-slate-700">
+          <ul className="divide-y divide-zinc-100 dark:divide-zinc-800">
             {household.members.map((m: HouseholdMember) => (
-              <li key={m.userId} className="flex items-center gap-3 px-4 py-3">
-                <div className="flex-1 min-w-0">
-                  <p className="truncate text-sm font-medium dark:text-slate-200">
+              <li key={m.userId} className="flex items-center gap-3 px-6 py-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-sm font-semibold text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                  {m.name.charAt(0).toUpperCase()}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-zinc-900 dark:text-zinc-100">
                     {m.name}
                   </p>
-                  <p className="truncate text-xs text-slate-500 dark:text-slate-400">
+                  <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">
                     {m.email}
                   </p>
                 </div>
-
-                <Badge
-                  className={
-                    m.role === 'admin'
-                      ? 'bg-amber-100 text-amber-700 hover:bg-amber-100 dark:bg-amber-900/40 dark:text-amber-400 dark:hover:bg-amber-900/40'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-100 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-700'
-                  }
-                >
+                <Badge variant={m.role === 'admin' ? 'admin' : 'member'}>
                   {m.role === 'admin' && (
-                    <Crown className="mr-1 h-3 w-3 inline" />
+                    <Crown className="mr-1 inline h-3 w-3" />
                   )}
                   {m.role}
                 </Badge>
-
                 {isAdmin && m.userId !== currentUserId && (
                   <div className="flex gap-1">
                     <Button
@@ -256,7 +284,7 @@ export default function HouseholdPage() {
                     <Button
                       size="icon"
                       variant="ghost"
-                      className="h-7 w-7 text-red-500 hover:text-red-600 dark:text-red-400"
+                      className="h-7 w-7 text-rose-500 hover:text-rose-600 dark:text-rose-400"
                       onClick={() => removeUser(m.userId)}
                     >
                       <Trash2 className="h-3.5 w-3.5" />
@@ -269,48 +297,50 @@ export default function HouseholdPage() {
         </CardContent>
       </Card>
 
+      {/* Invite member (admin only) */}
       {isAdmin && (
-        <Card className="max-w-md">
+        <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <UserPlus className="h-4 w-4" />
-              Invite member
+            <CardTitle className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+              <span className="flex items-center gap-2">
+                <UserPlus className="h-4 w-4" />
+                Invite member
+              </span>
             </CardTitle>
           </CardHeader>
           <CardContent>
             <form
               onSubmit={handleInvite((v) => sendInvite(v))}
-              className="space-y-3"
               noValidate
+              className="flex flex-col gap-4"
             >
-              <div className="space-y-1">
-                <Label htmlFor="invite-email">Email address</Label>
+              <div className="flex gap-3">
                 <Input
                   id="invite-email"
                   type="email"
                   placeholder="colleague@example.com"
+                  className="max-w-sm"
                   {...registerInvite('email')}
                 />
-                {inviteErrors.email && (
-                  <p className="text-sm text-red-500">
-                    {inviteErrors.email.message}
-                  </p>
-                )}
-                {inviteErrors.root && (
-                  <p className="text-sm text-red-500">
-                    {inviteErrors.root.message}
-                  </p>
-                )}
-                {inviteSuccess && (
-                  <p className="text-sm text-emerald-600 dark:text-emerald-400">
-                    Invitation sent!
-                  </p>
-                )}
+                <Button type="submit" disabled={isInviting}>
+                  {isInviting ? 'Sending…' : 'Send invitation'}
+                </Button>
               </div>
-              <Separator />
-              <Button type="submit" disabled={isInviting}>
-                {isInviting ? 'Sending…' : 'Send invitation'}
-              </Button>
+              {inviteErrors.email && (
+                <p className="text-xs text-rose-600 dark:text-rose-400">
+                  {inviteErrors.email.message}
+                </p>
+              )}
+              {inviteErrors.root && (
+                <p className="text-xs text-rose-600 dark:text-rose-400">
+                  {inviteErrors.root.message}
+                </p>
+              )}
+              {inviteSuccess && (
+                <p className="text-xs text-emerald-600 dark:text-emerald-400">
+                  Invitation sent!
+                </p>
+              )}
             </form>
           </CardContent>
         </Card>

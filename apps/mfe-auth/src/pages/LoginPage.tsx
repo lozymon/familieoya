@@ -3,7 +3,14 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link, useNavigate } from 'react-router-dom';
-import { ThemeProvider, useTheme, ThemeToggle } from '@familieoya/ui';
+import {
+  ThemeProvider,
+  useTheme,
+  ThemeToggle,
+  Button,
+  Input,
+  Label,
+} from '@familieoya/ui';
 import { useAuth } from '../hooks/useAuth';
 
 const schema = z.object({
@@ -23,9 +30,7 @@ function LoginForm() {
     handleSubmit,
     formState: { errors, isSubmitting },
     setError,
-  } = useForm<FormValues>({
-    resolver: zodResolver(schema),
-  });
+  } = useForm<FormValues>({ resolver: zodResolver(schema) });
 
   const onSubmit = async (values: FormValues) => {
     try {
@@ -36,12 +41,6 @@ function LoginForm() {
     }
   };
 
-  const inputStyle = {
-    background: isDark ? '#0f172a' : '#f8fafc',
-    borderColor: isDark ? '#334155' : '#d1d5db',
-    color: isDark ? '#f1f5f9' : '#111827',
-  };
-
   return (
     <div
       style={{
@@ -49,88 +48,108 @@ function LoginForm() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '1rem',
-        background: isDark ? '#0f172a' : '#f1f5f9',
-        transition: 'background 0.2s',
+        backgroundColor: isDark ? '#09090b' : '#e4e4e7',
+        padding: '1.5rem',
       }}
     >
+      {/* Theme toggle */}
       <div style={{ position: 'fixed', top: '1rem', right: '1rem' }}>
         <ThemeToggle />
       </div>
 
-      <div style={{ width: '100%', maxWidth: '400px' }}>
+      <div
+        style={{
+          width: '100%',
+          maxWidth: '400px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '2rem',
+        }}
+      >
         {/* Brand */}
-        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '0.75rem',
+          }}
+        >
           <div
             style={{
-              width: '44px',
-              height: '44px',
-              background: '#6366f1',
-              borderRadius: '10px',
+              width: '48px',
+              height: '48px',
+              backgroundColor: '#059669',
+              borderRadius: '12px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              margin: '0 auto 12px',
             }}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
               fill="white"
-              width="22"
-              height="22"
+              width="24"
+              height="24"
             >
               <path d="M11.47 3.841a.75.75 0 0 1 1.06 0l8.69 8.69a.75.75 0 1 0 1.06-1.061l-8.689-8.69a2.25 2.25 0 0 0-3.182 0l-8.69 8.69a.75.75 0 1 0 1.061 1.06l8.69-8.689Z" />
               <path d="m12 5.432 8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 0 1-.75-.75v-4.5a.75.75 0 0 0-.75-.75h-3a.75.75 0 0 0-.75.75V21a.75.75 0 0 1-.75.75H5.625a1.875 1.875 0 0 1-1.875-1.875v-6.198a2.29 2.29 0 0 0 .091-.086L12 5.432Z" />
             </svg>
           </div>
-          <h1
-            style={{
-              fontSize: '1.125rem',
-              fontWeight: 600,
-              letterSpacing: '-0.01em',
-              margin: 0,
-              color: isDark ? '#f8fafc' : '#0f172a',
-            }}
-          >
-            Familieoya
-          </h1>
-          <p
-            style={{
-              fontSize: '0.8125rem',
-              marginTop: '4px',
-              color: '#64748b',
-            }}
-          >
-            Family budget, simplified
-          </p>
+          <div style={{ textAlign: 'center' }}>
+            <p
+              style={{
+                fontSize: '1.125rem',
+                fontWeight: 700,
+                margin: 0,
+                color: isDark ? '#fafafa' : '#18181b',
+              }}
+            >
+              Familieøya
+            </p>
+            <p
+              style={{
+                fontSize: '0.875rem',
+                margin: '2px 0 0',
+                color: isDark ? '#a1a1aa' : '#71717a',
+              }}
+            >
+              Family budget, simplified
+            </p>
+          </div>
         </div>
 
         {/* Card */}
         <div
           style={{
-            borderRadius: '12px',
+            backgroundColor: isDark ? '#18181b' : '#ffffff',
+            border: `1px solid ${isDark ? '#27272a' : '#e4e4e7'}`,
+            borderRadius: '16px',
             padding: '2rem',
-            background: isDark ? '#1e293b' : '#ffffff',
-            border: `1px solid ${isDark ? '#334155' : '#e2e8f0'}`,
             boxShadow: isDark
-              ? '0 25px 50px -12px rgba(0,0,0,0.5)'
-              : '0 10px 40px -8px rgba(0,0,0,0.12)',
-            transition: 'all 0.2s',
+              ? '0 20px 60px rgba(0,0,0,0.6)'
+              : '0 8px 40px rgba(0,0,0,0.12)',
           }}
         >
-          <div style={{ marginBottom: '1.5rem' }}>
-            <h2
+          <div style={{ marginBottom: '1.75rem' }}>
+            <h1
               style={{
-                fontSize: '1.25rem',
-                fontWeight: 600,
+                fontSize: '1.5rem',
+                fontWeight: 700,
                 margin: '0 0 4px',
-                color: isDark ? '#f1f5f9' : '#0f172a',
+                color: isDark ? '#fafafa' : '#18181b',
               }}
             >
               Welcome back
-            </h2>
-            <p style={{ fontSize: '0.875rem', margin: 0, color: '#64748b' }}>
+            </h1>
+            <p
+              style={{
+                fontSize: '0.875rem',
+                margin: 0,
+                color: isDark ? '#a1a1aa' : '#71717a',
+              }}
+            >
               Sign in to your account to continue
             </p>
           </div>
@@ -138,49 +157,21 @@ function LoginForm() {
           <form
             onSubmit={handleSubmit(onSubmit)}
             noValidate
-            style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}
+            style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}
           >
             <div
               style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}
             >
-              <label
-                htmlFor="email"
-                style={{
-                  fontSize: '0.875rem',
-                  fontWeight: 500,
-                  color: isDark ? '#cbd5e1' : '#374151',
-                }}
-              >
-                Email
-              </label>
-              <input
+              <Label htmlFor="email">Email</Label>
+              <Input
                 id="email"
                 type="email"
                 autoComplete="email"
                 placeholder="you@example.com"
-                style={{
-                  height: '40px',
-                  width: '100%',
-                  borderRadius: '6px',
-                  border: `1px solid ${inputStyle.borderColor}`,
-                  background: inputStyle.background,
-                  color: inputStyle.color,
-                  padding: '0 12px',
-                  fontSize: '0.875rem',
-                  outline: 'none',
-                  boxSizing: 'border-box',
-                  transition: 'border-color 0.15s',
-                }}
                 {...register('email')}
               />
               {errors.email && (
-                <p
-                  style={{
-                    color: isDark ? '#f87171' : '#dc2626',
-                    fontSize: '0.8125rem',
-                    margin: 0,
-                  }}
-                >
+                <p style={{ fontSize: '0.75rem', margin: 0, color: '#e11d48' }}>
                   {errors.email.message}
                 </p>
               )}
@@ -196,54 +187,26 @@ function LoginForm() {
                   justifyContent: 'space-between',
                 }}
               >
-                <label
-                  htmlFor="password"
-                  style={{
-                    fontSize: '0.875rem',
-                    fontWeight: 500,
-                    color: isDark ? '#cbd5e1' : '#374151',
-                  }}
-                >
-                  Password
-                </label>
+                <Label htmlFor="password">Password</Label>
                 <Link
                   to="/forgot-password"
                   style={{
-                    color: '#6366f1',
-                    fontSize: '0.8125rem',
+                    fontSize: '0.75rem',
+                    color: '#059669',
                     textDecoration: 'none',
                   }}
                 >
                   Forgot password?
                 </Link>
               </div>
-              <input
+              <Input
                 id="password"
                 type="password"
                 autoComplete="current-password"
-                style={{
-                  height: '40px',
-                  width: '100%',
-                  borderRadius: '6px',
-                  border: `1px solid ${inputStyle.borderColor}`,
-                  background: inputStyle.background,
-                  color: inputStyle.color,
-                  padding: '0 12px',
-                  fontSize: '0.875rem',
-                  outline: 'none',
-                  boxSizing: 'border-box',
-                  transition: 'border-color 0.15s',
-                }}
                 {...register('password')}
               />
               {errors.password && (
-                <p
-                  style={{
-                    color: isDark ? '#f87171' : '#dc2626',
-                    fontSize: '0.8125rem',
-                    margin: 0,
-                  }}
-                >
+                <p style={{ fontSize: '0.75rem', margin: 0, color: '#e11d48' }}>
                   {errors.password.message}
                 </p>
               )}
@@ -252,66 +215,48 @@ function LoginForm() {
             {errors.root && (
               <div
                 style={{
-                  borderRadius: '6px',
-                  padding: '10px 12px',
+                  padding: '10px 14px',
+                  borderRadius: '8px',
                   fontSize: '0.875rem',
-                  background: isDark ? 'rgba(239,68,68,0.1)' : '#fef2f2',
-                  border: `1px solid ${isDark ? 'rgba(239,68,68,0.3)' : '#fecaca'}`,
-                  color: isDark ? '#fca5a5' : '#dc2626',
+                  backgroundColor: isDark ? 'rgba(225,29,72,0.1)' : '#fff1f2',
+                  border: '1px solid rgba(225,29,72,0.3)',
+                  color: isDark ? '#fb7185' : '#e11d48',
                 }}
               >
                 {errors.root.message}
               </div>
             )}
 
-            <button
+            <Button
               type="submit"
               disabled={isSubmitting}
-              style={{
-                marginTop: '4px',
-                width: '100%',
-                height: '42px',
-                background: '#6366f1',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '8px',
-                fontSize: '0.9375rem',
-                fontWeight: 500,
-                cursor: isSubmitting ? 'not-allowed' : 'pointer',
-                opacity: isSubmitting ? 0.6 : 1,
-                transition: 'background 0.15s',
-              }}
-              onMouseOver={(e) => {
-                if (!isSubmitting) e.currentTarget.style.background = '#4f46e5';
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.background = '#6366f1';
-              }}
+              className="w-full"
+              style={{ marginTop: '4px' }}
             >
               {isSubmitting ? 'Signing in…' : 'Sign in'}
-            </button>
+            </Button>
+          </form>
 
-            <p
+          <p
+            style={{
+              textAlign: 'center',
+              fontSize: '0.875rem',
+              margin: '1.5rem 0 0',
+              color: isDark ? '#a1a1aa' : '#71717a',
+            }}
+          >
+            Don&apos;t have an account?{' '}
+            <Link
+              to="/register"
               style={{
-                textAlign: 'center',
-                fontSize: '0.875rem',
-                margin: '4px 0 0',
-                color: '#64748b',
+                fontWeight: 600,
+                color: '#059669',
+                textDecoration: 'none',
               }}
             >
-              Don&apos;t have an account?{' '}
-              <Link
-                to="/register"
-                style={{
-                  fontWeight: 500,
-                  textDecoration: 'none',
-                  color: isDark ? '#818cf8' : '#6366f1',
-                }}
-              >
-                Create one
-              </Link>
-            </p>
-          </form>
+              Create one
+            </Link>
+          </p>
         </div>
       </div>
     </div>

@@ -3,7 +3,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci --legacy-peer-deps
 COPY . .
-RUN npx nx vite-build shell --configuration=production
+RUN npx nx sync && npx nx vite-build shell --configuration=production
 
 FROM nginx:alpine
 COPY --from=builder /app/dist/apps/shell /usr/share/nginx/html

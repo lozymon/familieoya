@@ -3,33 +3,27 @@
 
 :root {
   --font-sans: ui-sans-serif, system-ui, sans-serif;
-}
 
-body {
-  font-family: var(--font-sans);
-  background-color: #f8fafc;
-  color: #0f172a;
-  margin: 0;
-  padding: 0;
-}
-
-[data-theme='dark'] body {
-  background-color: #0f172a;
-  color: #f1f5f9;
-}
-
-:root {
-  --chart-grid: #e2e8f0;
-  --chart-text: #64748b;
+  --chart-1: #059669;
+  --chart-2: #6366f1;
+  --chart-3: #f59e0b;
+  --chart-4: #e11d48;
+  --chart-5: #8b5cf6;
+  --chart-6: #06b6d4;
+  --chart-7: #f97316;
+  --chart-8: #84cc16;
+  --chart-grid: #e4e4e7;
+  --chart-text: #71717a;
   --chart-tooltip-bg: #ffffff;
-  --chart-tooltip-border: #e2e8f0;
-  --chart-tooltip-text: #0f172a;
+  --chart-tooltip-border: #e4e4e7;
+  --chart-tooltip-text: #18181b;
 }
 
 [data-theme='dark'] {
-  --chart-grid: #334155;
-  --chart-text: #94a3b8;
-  --chart-tooltip-bg: #1e293b;
-  --chart-tooltip-border: #334155;
-  --chart-tooltip-text: #f1f5f9;
+  --chart-1: #10b981;
+  --chart-grid: #27272a;
+  --chart-text: #a1a1aa;
+  --chart-tooltip-bg: #18181b;
+  --chart-tooltip-border: #27272a;
+  --chart-tooltip-text: #fafafa;
 }

@@ -94,6 +94,52 @@ All monetary amounts and percentages must use `font-variant-numeric: tabular-num
 
 ## Spacing & Layout
 
+### Spacing scale
+
+We use Tailwind's default 4px base unit. Only use values from this list — never arbitrary values like `mt-[13px]`.
+
+| Token | px  | Usage                                    |
+| ----- | --- | ---------------------------------------- |
+| `1`   | 4   | Icon gap, tight inline spacing           |
+| `1.5` | 6   | Label-to-input gap, badge inner padding  |
+| `2`   | 8   | Button icon gap, small component gap     |
+| `3`   | 12  | Input padding, list row gap              |
+| `4`   | 16  | Card compact padding, table cell padding |
+| `5`   | 20  | Form field gap                           |
+| `6`   | 24  | Card standard padding, section inner gap |
+| `8`   | 32  | Between major page sections              |
+| `12`  | 48  | Sidebar horizontal padding               |
+
+### Page structure — every page must follow this pattern
+
+```
+<div className="flex flex-col gap-8">         ← outer wrapper, gap-8 between all sections
+
+  {/* 1. Page header — always first */}
+  <div>
+    <h1 ...>Page title</h1>                    ← text-2xl font-semibold
+    <p ...>Subtitle or context</p>             ← text-sm text-zinc-500, mt-1
+  </div>
+
+  {/* 2. Primary action / filter bar — if needed */}
+  <div className="flex items-center gap-3">
+    ...inputs, selects, buttons...
+  </div>
+
+  {/* 3. Content — cards, tables, lists */}
+  <Card>...</Card>
+  <Card>...</Card>
+
+</div>
+```
+
+**Rules:**
+
+- Always `gap-8` between the page header and the first content block
+- Always `gap-6` between sibling cards
+- Never put content directly under `<h1>` — always wrap in the `<div>` block above
+- Always include a subtitle (`<p>`) under every page title — even one sentence
+
 ### Page layout
 
 ```
@@ -148,6 +194,70 @@ Active state: left border `border-l-2 border-[--color-primary]` + `bg-[--color-s
 | Standard card          | `p-6`                                         |
 | Compact card (KPI row) | `p-4`                                         |
 | Table card             | `px-0 py-0` (table has its own inner padding) |
+
+### Card internal structure
+
+Every card follows this internal layout:
+
+```
+<Card>
+  <CardHeader>                  ← pb-3 or pb-4, never default pb-6 for data cards
+    <CardTitle>Section name</CardTitle>          ← text-base font-semibold
+    [optional: right-aligned link or action]
+  </CardHeader>
+  <CardContent>
+    ...content...
+  </CardContent>
+</Card>
+```
+
+- `CardTitle` is always `text-base font-semibold` — never `text-2xl` inside a card
+- If a card has a table or list, use `CardContent className="p-0"` and let rows handle their own `px-6 py-3`
+- If a card has a form, use `CardContent` with default padding
+
+### List rows (inside cards)
+
+All list rows use the same pattern:
+
+```
+<li className="flex items-center gap-3 px-6 py-3">
+  [optional: avatar or icon — h-8 w-8 shrink-0]
+  <div className="min-w-0 flex-1">
+    <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">Primary text</p>
+    <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate">Secondary text</p>
+  </div>
+  [optional: badge, actions — shrink-0]
+</li>
+```
+
+- Always `px-6 py-3` — never `px-4` in list rows (that's for table cells)
+- Dividers: `divide-y divide-zinc-100 dark:divide-zinc-800` on the `<ul>`
+- Last row has no bottom border (handled by `divide-y` automatically)
+
+### Table cells
+
+| Element         | Padding     | Notes                                                         |
+| --------------- | ----------- | ------------------------------------------------------------- |
+| `<th>`          | `px-4 py-3` | `text-xs uppercase tracking-wide font-semibold text-zinc-500` |
+| `<td>`          | `px-4 py-3` | `text-sm`                                                     |
+| Amount `<td>`   | `px-4 py-3` | `text-right tabular-nums font-medium`                         |
+| Checkbox `<td>` | `px-4 py-3` | `w-10 shrink-0`                                               |
+| Action `<td>`   | `px-4 py-3` | `text-right w-16`                                             |
+
+### Forms
+
+| Element         | Class                                                  |
+| --------------- | ------------------------------------------------------ |
+| Field wrapper   | `flex flex-col gap-1.5`                                |
+| Label           | `text-sm font-medium text-zinc-700 dark:text-zinc-300` |
+| Helper text     | `text-xs text-zinc-500 dark:text-zinc-400`             |
+| Error text      | `text-xs text-rose-600 dark:text-rose-400`             |
+| Field group gap | `gap-5` between form fields                            |
+| Section gap     | `gap-8` between the page header and the form           |
+
+- Labels always above the input — never beside or floating
+- Error text always below the input — never in a toast or modal
+- A form `<section>` label (e.g. "Add custom category") is `text-sm font-medium text-zinc-700 dark:text-zinc-300`, placed above the input row
 
 ---
 
@@ -231,6 +341,360 @@ Add your first transaction to get started.
 - Title: `text-base font-semibold`
 - Description: `text-sm text-[--color-text-muted]`
 - CTA: primary button
+
+---
+
+## Loading States
+
+Every async operation must show a loading state. Never leave the user looking at a blank area or stale data.
+
+### Which pattern to use
+
+| Situation                                   | Pattern                                                     |
+| ------------------------------------------- | ----------------------------------------------------------- |
+| Full page first load                        | Skeleton rows/cards                                         |
+| Card/list reload (e.g. after filter change) | Keep stale data visible, show subtle spinner in card header |
+| Button action (submit, delete)              | Disable button + replace label with `…` suffix              |
+| Inline data (e.g. a single value)           | Replace with `—` (em dash)                                  |
+
+### Skeleton pattern
+
+Use for initial page loads where no data exists yet. Fake rows/cards with a pulse animation:
+
+```tsx
+// Table skeleton — 5 rows
+{
+  isLoading &&
+    Array.from({ length: 5 }).map((_, i) => (
+      <tr key={i} className="animate-pulse">
+        <td className="px-4 py-3">
+          <div className="h-4 w-4 rounded bg-zinc-200 dark:bg-zinc-700" />
+        </td>
+        <td className="px-4 py-3">
+          <div className="h-4 w-24 rounded bg-zinc-200 dark:bg-zinc-700" />
+        </td>
+        <td className="px-4 py-3">
+          <div className="h-4 w-40 rounded bg-zinc-200 dark:bg-zinc-700" />
+        </td>
+        <td className="px-4 py-3">
+          <div className="h-4 w-20 rounded bg-zinc-200 dark:bg-zinc-700" />
+        </td>
+        <td className="px-4 py-3 text-right">
+          <div className="ml-auto h-4 w-16 rounded bg-zinc-200 dark:bg-zinc-700" />
+        </td>
+      </tr>
+    ));
+}
+```
+
+### Button loading pattern
+
+```tsx
+<Button type="submit" disabled={isSubmitting}>
+  {isSubmitting ? 'Saving…' : 'Save'}
+</Button>
+```
+
+- Always disable the button during submission
+- Always append `…` to the label — never use a spinner inside a button
+- Never show two buttons (one to submit, one to cancel) while submitting
+
+### Inline value loading
+
+```tsx
+<p className="tabular-nums text-2xl font-bold">
+  {isLoading ? '—' : formatCurrency(amount)}
+</p>
+```
+
+- Use `—` (em dash) not `...` or `Loading`
+- Keep the same font/size so layout does not shift when data arrives
+
+---
+
+## Feedback & Success States
+
+How the app responds after a user action completes.
+
+### Success feedback
+
+Always inline, never a toast or modal. Green text below the action, auto-clears after 3 seconds.
+
+```tsx
+const [success, setSuccess] = useState(false);
+
+// In mutation onSuccess:
+setSuccess(true);
+setTimeout(() => setSuccess(false), 3000);
+
+// In JSX, directly below the submit button:
+{
+  success && (
+    <p className="text-xs text-emerald-600 dark:text-emerald-400">
+      Saved successfully.
+    </p>
+  );
+}
+```
+
+- Text is always `text-xs` — not a big banner
+- Always placed below the form/button, not at the top of the page
+- Auto-clears — never requires a dismiss action from the user
+
+### Error feedback
+
+Inline below the specific field that failed. For server errors (root errors), below the submit button.
+
+```tsx
+{
+  errors.root && (
+    <p className="text-xs text-rose-600 dark:text-rose-400">
+      {errors.root.message}
+    </p>
+  );
+}
+```
+
+- Never `alert()`, never a modal, never a toast
+- Field errors: below the input they relate to
+- Server/root errors: below the submit button
+
+### Destructive confirmations
+
+For irreversible actions (delete, remove member, delete account): replace the action button with an inline confirm step — not a modal.
+
+```
+[Delete]  →  [Are you sure?]  [Yes, delete]  [Cancel]
+```
+
+This keeps the user in context and avoids modal z-index and focus trap complexity.
+
+---
+
+## Page Header Variants
+
+Every page uses exactly one of these three header patterns. Choose based on whether the page has a primary action.
+
+### Variant A — Title + subtitle (read-only pages, reports, settings sections)
+
+```tsx
+<div>
+  <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
+    Page Title
+  </h1>
+  <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+    One sentence describing what this page shows.
+  </p>
+</div>
+```
+
+### Variant B — Title + subtitle + primary action (pages with a main CTA)
+
+```tsx
+<div className="flex items-start justify-between gap-4">
+  <div>
+    <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
+      Page Title
+    </h1>
+    <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+      One sentence describing what this page shows.
+    </p>
+  </div>
+  <Button asChild>
+    <Link to="/path/new">
+      <Plus className="h-4 w-4" />
+      Add item
+    </Link>
+  </Button>
+</div>
+```
+
+### Variant C — Title only (simple pages, sub-settings pages)
+
+Only acceptable when the page content itself makes context immediately obvious (e.g. a form page with a clear heading inside).
+
+```tsx
+<h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
+  Page Title
+</h1>
+```
+
+**Which pages use which:**
+
+| Page             | Variant                         |
+| ---------------- | ------------------------------- |
+| Dashboard        | B (+ Add transaction)           |
+| Transactions     | B (+ Add transaction)           |
+| Categories       | B (+ Add category)              |
+| Budgets          | B (+ Add budget)                |
+| Reports          | A                               |
+| Household        | B (+ Invite member, admin only) |
+| Settings         | A                               |
+| Login / Register | C (form is self-explanatory)    |
+
+---
+
+## Icon Mapping
+
+Always use the same icon for the same concept across all pages and all MFEs.
+
+| Concept                    | Icon              | Import       |
+| -------------------------- | ----------------- | ------------ |
+| Dashboard / overview       | `LayoutDashboard` | lucide-react |
+| Transaction / payment      | `CreditCard`      | lucide-react |
+| Category / tag             | `Tag`             | lucide-react |
+| Budget / target            | `Target`          | lucide-react |
+| Household / home           | `Home`            | lucide-react |
+| Reports / chart            | `BarChart2`       | lucide-react |
+| Settings / gear            | `Settings`        | lucide-react |
+| Income / up                | `TrendingUp`      | lucide-react |
+| Expense / down             | `TrendingDown`    | lucide-react |
+| Net / wallet               | `Wallet`          | lucide-react |
+| Savings                    | `PiggyBank`       | lucide-react |
+| Add / new                  | `Plus`            | lucide-react |
+| Edit / pencil              | `Pencil`          | lucide-react |
+| Delete / trash             | `Trash2`          | lucide-react |
+| Confirm / check            | `Check`           | lucide-react |
+| Cancel / close             | `X`               | lucide-react |
+| Member / user              | `User`            | lucide-react |
+| Invite / add user          | `UserPlus`        | lucide-react |
+| Admin / crown              | `Crown`           | lucide-react |
+| Notification / bell        | `Bell`            | lucide-react |
+| Receipt / transaction item | `ReceiptText`     | lucide-react |
+| Logout                     | `LogOut`          | lucide-react |
+| Theme / sun                | `Sun`             | lucide-react |
+| Theme / moon               | `Moon`            | lucide-react |
+
+**Rules:**
+
+- Never use two different icons for the same concept in different parts of the app
+- Always `h-4 w-4` for icons inside buttons and list rows
+- Always `h-5 w-5` for icons in the topbar
+- Always `h-8 w-8` or `h-10 w-10` for empty state icons (use `h-10 w-10` for primary empty states, `h-8 w-8` for inline/compact ones)
+- Never use emoji as icons
+
+---
+
+## Responsive Rules
+
+The app is primarily a desktop app (authenticated dashboard), but must be usable on tablet. Mobile is a nice-to-have — the Flutter app covers mobile users.
+
+### Breakpoints in use
+
+| Breakpoint | Width  | Notes                        |
+| ---------- | ------ | ---------------------------- |
+| `sm`       | 640px  | Minimum functional width     |
+| `md`       | 768px  | Tablet — sidebar may overlap |
+| `lg`       | 1024px | Full desktop layout          |
+
+### Grid behaviour
+
+| Component     | Desktop (`lg`) | Tablet (`md`)     | Mobile (`sm`)     |
+| ------------- | -------------- | ----------------- | ----------------- |
+| KPI stat row  | 4 columns      | 2 columns         | 1 column          |
+| Filter bar    | Single row     | Single row, wraps | Stacks vertically |
+| Settings tabs | Sidebar left   | Sidebar left      | Horizontal scroll |
+| Auth pages    | Centered card  | Centered card     | Full width card   |
+
+```tsx
+// KPI grid — correct responsive pattern
+<div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+```
+
+### What collapses vs what stays
+
+- **Sidebar**: always visible at `lg+`. At `md` and below it is hidden (mobile users use the Flutter app)
+- **Cards**: always full width — never side-by-side cards
+- **Tables**: horizontally scrollable at `sm` — wrap in `overflow-x-auto`
+- **Forms**: always full width within their container — never multi-column form layouts
+- **TopBar**: always full width, always visible
+
+---
+
+## Tailwind Build Setup — CRITICAL
+
+**Every MFE must have `@tailwindcss/vite` in its vite config.** Without it, Tailwind classes written in page components are never compiled. Only classes in `libs/ui` components are compiled (by the shell's build). This means `gap-8`, `grid-cols-4`, `flex-col`, etc. written directly in page files will have no effect at runtime.
+
+### Required vite.config.ts pattern for all MFEs
+
+```ts
+export default defineConfig(async () => {
+  const { default: tailwindcss } = await import('@tailwindcss/vite');
+  return {
+    plugins: [react(), tailwindcss(), federation({ ... })],
+    ...
+  };
+});
+```
+
+### Required styles.css in every MFE
+
+Each MFE must have `src/styles.css` with at minimum:
+
+```css
+@import 'tailwindcss';
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+```
+
+And every page component must import it: `import '../styles.css';`
+
+**The authoritative fix — shell `@source` scanning:** The shell's `apps/shell/src/styles.css` uses `@source` directives to scan every MFE's source files. This means all Tailwind classes in any page component are compiled into the shell's global CSS (always loaded). The MFE's own CSS file does NOT need to load correctly.
+
+When adding a new MFE, add a `@source` line to `apps/shell/src/styles.css` and rebuild the shell.
+
+---
+
+## Do / Don't
+
+Explicit rules derived from mistakes made during Phase 7c. Read this before writing any frontend code.
+
+### Colors
+
+| ❌ Don't                                   | ✅ Do                              |
+| ------------------------------------------ | ---------------------------------- |
+| `bg-indigo-600`                            | `bg-emerald-600`                   |
+| `text-slate-500`                           | `text-zinc-500`                    |
+| `text-red-500`                             | `text-rose-600`                    |
+| `border-slate-200`                         | `border-zinc-200`                  |
+| Hardcoded hex `#6366f1` in JSX             | Use Tailwind class or CSS variable |
+| `style={{ color: '#059669' }}` in app code | Use `className="text-emerald-600"` |
+| Inline styles for layout and spacing       | Use Tailwind classes               |
+
+**Exception:** Inline styles are acceptable only in `mfe-auth` pages where Tailwind v4 JIT scanning is unreliable in preview builds. Everywhere else use Tailwind classes.
+
+### Spacing
+
+| ❌ Don't                                 | ✅ Do                          |
+| ---------------------------------------- | ------------------------------ |
+| `gap-3` between major page sections      | `gap-8` between major sections |
+| `gap-6` between the title and first card | `gap-8`                        |
+| `px-4 py-3` in list rows                 | `px-6 py-3` in list rows       |
+| `px-6 py-3` in table cells               | `px-4 py-3` in table cells     |
+| Arbitrary values: `mt-[13px]`            | Use scale values only          |
+| Missing subtitle under page title        | Always add a subtitle          |
+
+### Components
+
+| ❌ Don't                             | ✅ Do                                  |
+| ------------------------------------ | -------------------------------------- |
+| Plain `<button>` element             | `<Button>` from `@familieoya/ui`       |
+| Plain `<input>` element              | `<Input>` from `@familieoya/ui`        |
+| `<p>No results.</p>` for empty lists | `<EmptyState>` from `@familieoya/ui`   |
+| "Loading…" text string               | Skeleton rows or `—` for inline values |
+| `CardTitle` with `text-2xl`          | `CardTitle` is always `text-base`      |
+| Different icons for the same concept | Follow the icon mapping table          |
+| `toast()` for success/error feedback | Inline text below the form             |
+| Modal for destructive confirmations  | Inline confirm step                    |
+
+### Structure
+
+| ❌ Don't                                      | ✅ Do                                                   |
+| --------------------------------------------- | ------------------------------------------------------- |
+| Content directly under `<h1>` with no wrapper | Wrap in `<div className="flex flex-col gap-8">`         |
+| Page without a subtitle                       | Always add `<p className="mt-1 text-sm text-zinc-500">` |
+| Mix of `gap-6` and `gap-8` at top level       | Always `gap-8` at page level                            |
+| Horizontal tab bar for settings               | Left sidebar tab pattern                                |
+| Split-panel layout for auth pages             | Centered card on zinc-50 background                     |
 
 ---
 

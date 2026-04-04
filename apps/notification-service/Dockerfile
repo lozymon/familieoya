@@ -9,7 +9,7 @@ RUN npm ci --legacy-peer-deps
 COPY . .
 RUN npx tsc --build libs/contracts/tsconfig.lib.json
 RUN npx tsc --build libs/common/tsconfig.lib.json
-RUN npx nx build notification-service --configuration=production
+RUN npx nx sync && npx nx build notification-service --configuration=production
 
 FROM node:24-alpine AS runner
 WORKDIR /app

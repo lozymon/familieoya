@@ -2,8 +2,8 @@ import '../styles.css';
 import { useContext, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { Plus, Trash2 } from 'lucide-react';
-import { Button, Badge, Card, CardContent } from '@familieoya/ui';
+import { Plus, Trash2, ReceiptText, X } from 'lucide-react';
+import { Button, Badge, EmptyState } from '@familieoya/ui';
 import {
   listTransactions,
   listCategories,
@@ -24,7 +24,7 @@ function currentMonth(): string {
 }
 
 const filterCls =
-  'rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100';
+  'rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100';
 
 export default function TransactionListPage() {
   const auth = useContext(AuthContext);
@@ -84,43 +84,43 @@ export default function TransactionListPage() {
   if (!householdId) {
     return (
       <div className="flex flex-col gap-4">
-        <h1 className="text-2xl font-semibold dark:text-slate-100">
+        <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
           Transactions
         </h1>
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-slate-500 dark:text-slate-400">
-              No household selected. Go to{' '}
-              <Link
-                to="/households"
-                className="underline text-indigo-600 dark:text-indigo-400"
-              >
-                Households
-              </Link>{' '}
-              to create or join one.
-            </p>
-          </CardContent>
-        </Card>
+        <EmptyState
+          icon={<ReceiptText className="h-10 w-10" />}
+          title="No household selected"
+          description="Create or join a household to start tracking transactions."
+          action={
+            <Button asChild>
+              <Link to="/households">Go to Households</Link>
+            </Button>
+          }
+        />
       </div>
     );
   }
 
+  const allSelected =
+    transactions.length > 0 && selected.size === transactions.length;
+
   return (
     <div className="flex flex-col gap-4">
+      {/* Page header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold dark:text-slate-100">
+        <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
           Transactions
         </h1>
         <Button asChild>
           <Link to="/transactions/new">
-            <Plus className="mr-2 h-4 w-4" />
-            Add
+            <Plus className="h-4 w-4" />
+            Add transaction
           </Link>
         </Button>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-wrap gap-3">
+      {/* Filter bar */}
+      <div className="flex flex-wrap items-center gap-3 rounded-lg border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-900">
         <input
           type="month"
           value={month}
@@ -130,7 +130,6 @@ export default function TransactionListPage() {
           }}
           className={filterCls}
         />
-
         <select
           value={filterCategory}
           onChange={(e) => {
@@ -146,7 +145,6 @@ export default function TransactionListPage() {
             </option>
           ))}
         </select>
-
         <select
           value={filterType}
           onChange={(e) => {
@@ -159,134 +157,158 @@ export default function TransactionListPage() {
           <option value="income">Income</option>
           <option value="expense">Expense</option>
         </select>
-
-        {selected.size > 0 && (
-          <Button
-            variant="destructive"
-            size="sm"
-            disabled={isDeleting}
-            onClick={() => bulkDelete([...selected])}
-          >
-            <Trash2 className="mr-2 h-4 w-4" />
-            Delete {selected.size} selected
-          </Button>
-        )}
       </div>
 
+      {/* Bulk action bar — slides in when rows are selected */}
+      {selected.size > 0 && (
+        <div className="flex items-center justify-between rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2.5 dark:border-zinc-700 dark:bg-zinc-800">
+          <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            {selected.size} selected
+          </span>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSelected(new Set())}
+              className="text-zinc-500"
+            >
+              <X className="h-4 w-4" />
+              Clear
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              disabled={isDeleting}
+              onClick={() => bulkDelete([...selected])}
+            >
+              <Trash2 className="h-4 w-4" />
+              Delete {selected.size}
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Table */}
-      <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800">
-        <table className="w-full text-sm">
-          <thead className="border-b border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-900">
-            <tr>
-              <th className="px-4 py-3 text-left">
-                <input
-                  type="checkbox"
-                  checked={
-                    transactions.length > 0 &&
-                    selected.size === transactions.length
-                  }
-                  onChange={toggleAll}
-                  className="cursor-pointer accent-indigo-600"
-                />
-              </th>
-              <th className="px-4 py-3 text-left font-medium text-slate-600 dark:text-slate-400">
-                Date
-              </th>
-              <th className="px-4 py-3 text-left font-medium text-slate-600 dark:text-slate-400">
-                Description
-              </th>
-              <th className="px-4 py-3 text-left font-medium text-slate-600 dark:text-slate-400">
-                Category
-              </th>
-              <th className="px-4 py-3 text-left font-medium text-slate-600 dark:text-slate-400">
-                Type
-              </th>
-              <th className="px-4 py-3 text-right font-medium text-slate-600 dark:text-slate-400">
-                Amount
-              </th>
-              <th className="px-4 py-3" />
-            </tr>
-          </thead>
-          <tbody>
-            {isLoading && (
-              <tr>
-                <td
-                  colSpan={7}
-                  className="px-4 py-8 text-center text-slate-500 dark:text-slate-400"
-                >
-                  Loading…
-                </td>
-              </tr>
-            )}
-            {!isLoading && transactions.length === 0 && (
-              <tr>
-                <td
-                  colSpan={7}
-                  className="px-4 py-8 text-center text-slate-500 dark:text-slate-400"
-                >
-                  No transactions found.
-                </td>
-              </tr>
-            )}
-            {transactions.map((t: Transaction) => (
-              <tr
-                key={t.id}
-                className="border-b border-slate-100 last:border-0 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-700/50"
-              >
-                <td className="px-4 py-3">
+      <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="border-b border-zinc-200 dark:border-zinc-800">
+              <tr className="bg-zinc-50 dark:bg-zinc-800/60">
+                <th className="w-10 px-4 py-3 text-left">
                   <input
                     type="checkbox"
-                    checked={selected.has(t.id)}
-                    onChange={() => toggleSelect(t.id)}
-                    className="cursor-pointer accent-indigo-600"
+                    checked={allSelected}
+                    onChange={toggleAll}
+                    className="cursor-pointer accent-emerald-600"
                   />
-                </td>
-                <td className="px-4 py-3 text-slate-700 dark:text-slate-300">
-                  {new Date(t.date).toLocaleDateString('nb-NO')}
-                </td>
-                <td className="px-4 py-3 text-slate-700 dark:text-slate-300">
-                  {t.description ?? (
-                    <span className="text-slate-400 dark:text-slate-500">
-                      —
-                    </span>
-                  )}
-                </td>
-                <td className="px-4 py-3 text-slate-700 dark:text-slate-300">
-                  {getCategoryName(t.categoryId)}
-                </td>
-                <td className="px-4 py-3">
-                  <Badge
-                    className={
-                      t.type === 'income'
-                        ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-900/40 dark:text-emerald-400 dark:hover:bg-emerald-900/40'
-                        : 'bg-red-100 text-red-700 hover:bg-red-100 dark:bg-red-900/40 dark:text-red-400 dark:hover:bg-red-900/40'
-                    }
-                  >
-                    {t.type}
-                  </Badge>
-                </td>
-                <td
-                  className={`px-4 py-3 text-right font-medium ${
-                    t.type === 'income'
-                      ? 'text-emerald-600 dark:text-emerald-400'
-                      : 'text-red-600 dark:text-red-400'
-                  }`}
-                >
-                  {t.type === 'income' ? '+' : '-'}
-                  {formatCurrency(t.amount)}
-                </td>
-                <td className="px-4 py-3">
-                  <Link
-                    to={`/transactions/${t.id}/edit`}
-                    className="text-xs text-indigo-600 underline hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
-                  >
-                    Edit
-                  </Link>
-                </td>
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+                  Date
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+                  Description
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+                  Category
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+                  Type
+                </th>
+                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+                  Amount
+                </th>
+                <th className="w-16 px-4 py-3" />
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+              {isLoading && (
+                <tr>
+                  <td
+                    colSpan={7}
+                    className="px-4 py-10 text-center text-zinc-400 dark:text-zinc-500"
+                  >
+                    Loading…
+                  </td>
+                </tr>
+              )}
+              {!isLoading && transactions.length === 0 && (
+                <tr>
+                  <td colSpan={7}>
+                    <EmptyState
+                      icon={<ReceiptText className="h-8 w-8" />}
+                      title="No transactions found"
+                      description="Try adjusting your filters or add a new transaction."
+                      action={
+                        <Button asChild size="sm">
+                          <Link to="/transactions/new">
+                            <Plus className="h-4 w-4" />
+                            Add transaction
+                          </Link>
+                        </Button>
+                      }
+                      className="py-12"
+                    />
+                  </td>
+                </tr>
+              )}
+              {transactions.map((t: Transaction, i: number) => (
+                <tr
+                  key={t.id}
+                  className={
+                    i % 2 === 0
+                      ? 'bg-white hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800/60'
+                      : 'bg-zinc-50/60 hover:bg-zinc-100/60 dark:bg-zinc-800/30 dark:hover:bg-zinc-800/60'
+                  }
+                >
+                  <td className="px-4 py-3">
+                    <input
+                      type="checkbox"
+                      checked={selected.has(t.id)}
+                      onChange={() => toggleSelect(t.id)}
+                      className="cursor-pointer accent-emerald-600"
+                    />
+                  </td>
+                  <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">
+                    {new Date(t.date).toLocaleDateString('nb-NO')}
+                  </td>
+                  <td className="px-4 py-3 font-medium text-zinc-900 dark:text-zinc-100">
+                    {t.description ?? (
+                      <span className="font-normal text-zinc-400 dark:text-zinc-500">
+                        —
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">
+                    {getCategoryName(t.categoryId)}
+                  </td>
+                  <td className="px-4 py-3">
+                    <Badge variant={t.type === 'income' ? 'income' : 'expense'}>
+                      {t.type}
+                    </Badge>
+                  </td>
+                  <td
+                    className={`px-4 py-3 text-right tabular-nums font-medium ${
+                      t.type === 'income'
+                        ? 'text-emerald-600 dark:text-emerald-400'
+                        : 'text-rose-600 dark:text-rose-400'
+                    }`}
+                  >
+                    {t.type === 'income' ? '+' : '−'}
+                    {formatCurrency(t.amount)}
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    <Link
+                      to={`/transactions/${t.id}/edit`}
+                      className="text-xs font-medium text-emerald-600 hover:underline dark:text-emerald-400"
+                    >
+                      Edit
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
