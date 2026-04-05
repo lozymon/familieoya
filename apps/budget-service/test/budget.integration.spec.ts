@@ -192,7 +192,7 @@ describe('budget-service — CRUD + spending totals + threshold alerts', () => {
         categoryId: CATEGORY_ID,
         amount: 50000,
         type: 'expense',
-        date: '2026-03-15',
+        date: '2026-04-15',
       };
       await consumer.onTransactionCreated(event, mockRmqContext());
 
@@ -221,7 +221,7 @@ describe('budget-service — CRUD + spending totals + threshold alerts', () => {
           categoryId: CATEGORY_ID,
           amount: 999999,
           type: 'income',
-          date: '2026-03-15',
+          date: '2026-04-15',
         },
         mockRmqContext(),
       );
@@ -246,7 +246,7 @@ describe('budget-service — CRUD + spending totals + threshold alerts', () => {
         categoryId: CATEGORY_ID,
         amount: 10000,
         type: 'expense',
-        date: '2026-03-15',
+        date: '2026-04-15',
       };
 
       await consumer.onTransactionCreated(event, mockRmqContext());
@@ -282,7 +282,7 @@ describe('budget-service — CRUD + spending totals + threshold alerts', () => {
           categoryId: CATEGORY_ID,
           amount: 85000,
           type: 'expense',
-          date: '2026-03-15',
+          date: '2026-04-15',
         },
         mockRmqContext(),
       );
@@ -315,7 +315,7 @@ describe('budget-service — CRUD + spending totals + threshold alerts', () => {
           categoryId: CATEGORY_ID,
           amount: 110000,
           type: 'expense',
-          date: '2026-03-15',
+          date: '2026-04-15',
         },
         mockRmqContext(),
       );
@@ -342,7 +342,7 @@ describe('budget-service — CRUD + spending totals + threshold alerts', () => {
           categoryId: CATEGORY_ID,
           amount: 110000,
           type: 'expense',
-          date: '2026-03-15',
+          date: '2026-04-15',
         },
         mockRmqContext(),
       );
@@ -356,7 +356,7 @@ describe('budget-service — CRUD + spending totals + threshold alerts', () => {
           categoryId: CATEGORY_ID,
           amount: 5000,
           type: 'expense',
-          date: '2026-03-16',
+          date: '2026-04-16',
         },
         mockRmqContext(),
       );
@@ -387,7 +387,7 @@ describe('budget-service — CRUD + spending totals + threshold alerts', () => {
           categoryId: CATEGORY_ID,
           amount: 60000,
           type: 'expense',
-          date: '2026-03-10',
+          date: '2026-04-10',
         },
         mockRmqContext(),
       );
@@ -400,7 +400,7 @@ describe('budget-service — CRUD + spending totals + threshold alerts', () => {
           categoryId: CATEGORY_ID,
           previousAmount: 60000,
           type: 'expense',
-          date: '2026-03-10',
+          date: '2026-04-10',
         } satisfies TransactionDeletedEvent,
         mockRmqContext(),
       );
@@ -430,7 +430,7 @@ describe('budget-service — CRUD + spending totals + threshold alerts', () => {
           categoryId: CATEGORY_ID,
           amount: 30000,
           type: 'expense',
-          date: '2026-03-10',
+          date: '2026-04-10',
         },
         mockRmqContext(),
       );
@@ -443,11 +443,11 @@ describe('budget-service — CRUD + spending totals + threshold alerts', () => {
           categoryId: CATEGORY_ID,
           amount: 70000,
           type: 'expense',
-          date: '2026-03-10',
+          date: '2026-04-10',
           previousCategoryId: CATEGORY_ID,
           previousAmount: 30000,
           previousType: 'expense',
-          previousDate: '2026-03-10',
+          previousDate: '2026-04-10',
         } satisfies TransactionUpdatedEvent,
         mockRmqContext(),
       );
@@ -477,7 +477,7 @@ describe('budget-service — CRUD + spending totals + threshold alerts', () => {
           categoryId: CATEGORY_ID,
           amount: 90000,
           type: 'expense',
-          date: '2026-03-15',
+          date: '2026-04-15',
         },
         mockRmqContext(),
       );
