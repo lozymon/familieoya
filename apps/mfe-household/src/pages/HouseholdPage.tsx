@@ -250,11 +250,11 @@ export default function HouseholdPage() {
             {household.members.map((m: HouseholdMember) => (
               <li key={m.userId} className="flex items-center gap-3 px-6 py-3">
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-sm font-semibold text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
-                  {m.name.charAt(0).toUpperCase()}
+                  {(m.name ?? m.email ?? '?').charAt(0).toUpperCase()}
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium text-zinc-900 dark:text-zinc-100">
-                    {m.name}
+                    {m.name ?? m.email}
                   </p>
                   <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">
                     {m.email}

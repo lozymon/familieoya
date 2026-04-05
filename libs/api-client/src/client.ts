@@ -1,19 +1,41 @@
 import axios, { type AxiosInstance } from 'axios';
 
-let tokenGetter: (() => string | null) | null = null;
-let tokenSetter: ((token: string | null) => void) | null = null;
-let householdIdGetter: (() => string | null) | null = null;
+// Each MFE bundle gets its own copy of this module, so module-level variables
+// are not shared across bundles. Store accessors on window so every MFE reads
+// the same token that the shell's AuthProvider sets.
+const WIN_KEY = '__familieoya_token_accessors__';
+
+declare global {
+  interface Window {
+    [WIN_KEY]?: {
+      get: () => string | null;
+      set: (token: string | null) => void;
+      getHouseholdId: () => string | null;
+    };
+  }
+}
 
 export function setTokenAccessors(
   getter: () => string | null,
   setter: (token: string | null) => void,
 ) {
-  tokenGetter = getter;
-  tokenSetter = setter;
+  if (typeof window !== 'undefined') {
+    window[WIN_KEY] = {
+      get: getter,
+      set: setter,
+      getHouseholdId: window[WIN_KEY]?.getHouseholdId ?? (() => null),
+    };
+  }
 }
 
 export function setHouseholdIdAccessor(getter: () => string | null) {
-  householdIdGetter = getter;
+  if (typeof window !== 'undefined') {
+    window[WIN_KEY] = {
+      get: window[WIN_KEY]?.get ?? (() => null),
+      set: window[WIN_KEY]?.set ?? (() => undefined),
+      getHouseholdId: getter,
+    };
+  }
 }
 
 export const apiClient: AxiosInstance = axios.create({
@@ -22,11 +44,11 @@ export const apiClient: AxiosInstance = axios.create({
 });
 
 apiClient.interceptors.request.use((config) => {
-  const token = tokenGetter?.();
+  const token = window[WIN_KEY]?.get();
   if (token) {
     config.headers['Authorization'] = `Bearer ${token}`;
   }
-  const householdId = householdIdGetter?.();
+  const householdId = window[WIN_KEY]?.getHouseholdId();
   if (householdId) {
     config.headers['X-Household-ID'] = householdId;
   }
@@ -74,14 +96,14 @@ apiClient.interceptors.response.use(
           '/auth/refresh',
         );
         const newToken = data.accessToken;
-        tokenSetter?.(newToken);
+        window[WIN_KEY]?.set(newToken);
         onRefreshed(newToken);
         if (originalRequest.headers) {
           originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
         }
         return apiClient(originalRequest as Parameters<typeof apiClient>[0]);
       } catch {
-        tokenSetter?.(null);
+        window[WIN_KEY]?.set(null);
         return Promise.reject(error);
       } finally {
         isRefreshing = false;

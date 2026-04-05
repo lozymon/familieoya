@@ -21,6 +21,17 @@ import type { Socket } from 'socket.io-client';
 import { useQueryClient } from '@tanstack/react-query';
 
 const HOUSEHOLD_STORAGE_KEY = 'familieoya_active_household';
+const SESSION_TOKEN_KEY = 'familieoya_access_token';
+
+function isTokenExpired(token: string): boolean {
+  try {
+    const [, payload] = token.split('.');
+    const { exp } = JSON.parse(atob(payload)) as { exp: number };
+    return exp * 1000 < Date.now();
+  } catch {
+    return true;
+  }
+}
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [accessToken, setAccessToken] = useState<string | null>(null);
@@ -30,21 +41,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     string | null
   >(() => localStorage.getItem(HOUSEHOLD_STORAGE_KEY));
   const socketRef = useRef<Socket | null>(null);
-  // Ref keeps the latest token synchronously available for the axios interceptor
-  // without waiting for a React re-render + effect cycle.
   const tokenRef = useRef<string | null>(null);
   const queryClient = useQueryClient();
 
-  // Wire accessors once — getter reads the ref, setter updates both ref and state.
-  useEffect(() => {
-    setTokenAccessors(
-      () => tokenRef.current,
-      (token) => {
-        tokenRef.current = token;
-        setAccessToken(token);
-      },
-    );
+  // Centralised token setter — updates ref, sessionStorage, and React state.
+  const applyToken = useCallback((token: string | null) => {
+    tokenRef.current = token;
+    if (token) {
+      sessionStorage.setItem(SESSION_TOKEN_KEY, token);
+    } else {
+      sessionStorage.removeItem(SESSION_TOKEN_KEY);
+    }
+    setAccessToken(token);
   }, []);
+
+  // Wire accessors once so the axios interceptor can read/write the token.
+  useEffect(() => {
+    setTokenAccessors(() => tokenRef.current, applyToken);
+  }, [applyToken]);
 
   const setActiveHouseholdId = useCallback((id: string | null) => {
     setActiveHouseholdIdState(id);
@@ -60,25 +74,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setHouseholdIdAccessor(() => activeHouseholdId);
   }, [activeHouseholdId]);
 
-  // Attempt a silent refresh on mount to restore session
+  // Attempt to restore session on mount:
+  // 1. Use sessionStorage token if still valid (no network round-trip).
+  // 2. Fall back to httpOnly refresh cookie.
   useEffect(() => {
     const tryRestore = async () => {
+      const stored = sessionStorage.getItem(SESSION_TOKEN_KEY);
+      if (stored && !isTokenExpired(stored)) {
+        tokenRef.current = stored;
+        setAccessToken(stored);
+        try {
+          const profile = await getMe();
+          setUser(profile);
+        } catch {
+          applyToken(null);
+        }
+        setIsLoading(false);
+        return;
+      }
+
       try {
         const { data } = await import('@familieoya/api-client').then((m) =>
           m.apiClient.post<{ accessToken: string }>('/auth/refresh'),
         );
-        tokenRef.current = data.accessToken;
-        setAccessToken(data.accessToken);
+        applyToken(data.accessToken);
         const profile = await getMe();
         setUser(profile);
       } catch {
-        // No valid refresh token — user stays logged out
+        // No valid session — user must log in
       } finally {
         setIsLoading(false);
       }
     };
     void tryRestore();
-  }, []);
+  }, [applyToken]);
 
   // Connect/disconnect WebSocket based on token
   useEffect(() => {
@@ -95,23 +124,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, [accessToken, queryClient]);
 
-  const login = useCallback(async (dto: LoginDto) => {
-    const { accessToken: token } = await apiLogin(dto);
-    tokenRef.current = token;
-    setAccessToken(token);
-    const profile = await getMe();
-    setUser(profile);
-  }, []);
+  const login = useCallback(
+    async (dto: LoginDto) => {
+      const { accessToken: token } = await apiLogin(dto);
+      applyToken(token);
+      const profile = await getMe();
+      setUser(profile);
+    },
+    [applyToken],
+  );
 
   const logout = useCallback(async () => {
     try {
       await apiLogout();
     } finally {
-      setAccessToken(null);
+      applyToken(null);
       setUser(null);
       queryClient.clear();
     }
-  }, [queryClient]);
+  }, [applyToken, queryClient]);
 
   return (
     <AuthContext.Provider
@@ -122,7 +153,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         activeHouseholdId,
         login,
         logout,
-        setAccessToken,
+        setAccessToken: applyToken,
         setActiveHouseholdId,
       }}
     >

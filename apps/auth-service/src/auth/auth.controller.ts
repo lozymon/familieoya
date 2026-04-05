@@ -53,14 +53,11 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const rawToken = req.cookies?.[REFRESH_COOKIE] as string | undefined;
-    const userId = req.headers['x-user-id'] as string | undefined;
 
-    if (!rawToken || !userId) throw new UnauthorizedException();
+    if (!rawToken) throw new UnauthorizedException();
 
-    const { accessToken, refreshToken } = await this.authService.refresh(
-      userId,
-      rawToken,
-    );
+    const { accessToken, refreshToken } =
+      await this.authService.refresh(rawToken);
     res.cookie(REFRESH_COOKIE, refreshToken, COOKIE_OPTIONS);
     return { accessToken };
   }

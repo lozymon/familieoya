@@ -80,9 +80,14 @@ export class AuthService {
   }
 
   async refresh(
-    userId: string,
     rawToken: string,
   ): Promise<{ accessToken: string; refreshToken: string }> {
+    // userId is embedded in the token as "userId:uuid"
+    const colonIdx = rawToken.indexOf(':');
+    if (colonIdx === -1)
+      throw new UnauthorizedException('Invalid refresh token');
+    const userId = rawToken.substring(0, colonIdx);
+
     const tokens = await this.refreshTokens.find({ where: { userId } });
     let matchedToken: RefreshToken | null = null;
 
@@ -229,7 +234,7 @@ export class AuthService {
       plan: 'free' as const,
     });
 
-    const rawRefreshToken = crypto.randomUUID();
+    const rawRefreshToken = `${user.id}:${crypto.randomUUID()}`;
     const tokenHash = await bcrypt.hash(rawRefreshToken, BCRYPT_ROUNDS);
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + REFRESH_TOKEN_TTL_DAYS);
