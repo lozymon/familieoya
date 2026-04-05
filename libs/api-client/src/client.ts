@@ -67,15 +67,24 @@ apiClient.interceptors.response.use(
   (response) => response,
   async (error: unknown) => {
     const axiosError = error as {
-      config?: { _retry?: boolean; headers?: Record<string, string> };
+      config?: {
+        _retry?: boolean;
+        headers?: Record<string, string>;
+        url?: string;
+      };
       response?: { status: number };
     };
     const originalRequest = axiosError.config;
+    const requestUrl = originalRequest?.url ?? '';
+    const isAuthEndpoint =
+      requestUrl.includes('/auth/login') ||
+      requestUrl.includes('/auth/refresh');
 
     if (
       axiosError.response?.status === 401 &&
       originalRequest &&
-      !originalRequest._retry
+      !originalRequest._retry &&
+      !isAuthEndpoint
     ) {
       if (isRefreshing) {
         return new Promise<string>((resolve) => {

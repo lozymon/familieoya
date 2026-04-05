@@ -3,7 +3,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci --legacy-peer-deps
 COPY . .
-RUN npx nx sync && npx nx vite-build mfe-budget --configuration=production
+RUN NX_DAEMON=false NX_ISOLATE_PLUGINS=false npx nx sync && NX_DAEMON=false NX_ISOLATE_PLUGINS=false npx nx vite-build mfe-budget --configuration=production
 
 FROM nginx:alpine
 COPY --from=builder /app/dist/apps/mfe-budget /usr/share/nginx/html

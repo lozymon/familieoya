@@ -5,7 +5,7 @@ RUN npm ci --legacy-peer-deps
 COPY . .
 RUN npx tsc --build libs/contracts/tsconfig.lib.json
 RUN npx tsc --build libs/common/tsconfig.lib.json
-RUN npx nx sync && npx nx build budget-service --configuration=production
+RUN NX_DAEMON=false NX_ISOLATE_PLUGINS=false npx nx sync && NX_DAEMON=false NX_ISOLATE_PLUGINS=false npx nx build budget-service --configuration=production
 
 FROM node:24-alpine AS runner
 WORKDIR /app
